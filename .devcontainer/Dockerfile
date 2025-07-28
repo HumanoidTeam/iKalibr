@@ -27,8 +27,8 @@ ENV DISPLAY=:0
 ENV XDG_RUNTIME_DIR=/tmp
 
 # Create necessary directories and set ownership
-RUN mkdir -p /workspace /tmp/.X11-unix /home/developer/datasets /home/iKalibr/src/ikalibr /root/datasets && \
-    chown -R developer:developer /workspace /home/developer /home/iKalibr
+RUN mkdir -p /home/iKalibr/src/ikalibr /tmp/.X11-unix /home/developer/datasets /root/datasets && \
+    chown -R developer:developer /home/developer /home/iKalibr
 
 # Copy and set up the build script
 COPY build_ikalibr.sh /home/developer/build_ikalibr.sh
@@ -51,8 +51,8 @@ RUN echo 'source /etc/profile.d/bash_completion.sh' >> ~/.bashrc && \
 # Add ROS workspace sourcing
 RUN echo 'if [ -f /home/iKalibr/devel/setup.bash ]; then source /home/iKalibr/devel/setup.bash; fi' >> ~/.bashrc
 
-# Set the working directory
-WORKDIR /workspace
+# Set the working directory to match devcontainer.json
+WORKDIR /home/iKalibr
 
 # Keep the container running
 CMD ["/bin/bash"] 

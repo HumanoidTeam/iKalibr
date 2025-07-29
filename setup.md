@@ -45,22 +45,51 @@
    # Build iKalibr
    cd src/ikalibr && ./build_ikalibr.sh
    ```
-3. 
 
-## Running iKalibr
+## Dataset preparation
 
-## Troubleshooting
+Now that every thing is built to test if anything running 
 
-If you don't see the "Reopen in Container" prompt:
-1. Ensure Docker is running on your system
-2. Command Palette (F1) -> "Remote-Containers: Rebuild and Reopen in Container"
-3. Check the .devcontainer/devcontainer.json file exists and is valid
+### [Optional] iKalibr dataset 
+To check if everything is working perfectly run the ikalibr dataset 
+   ```bash
+   roslaunch ikalibr ikalibr-prog.launch config_path:=/home/iKalibr/src/ikalibr/config/ikalibr-dataset-config.yaml
+   ```
 
-## Next Steps
+### HMND dataset
+   
+#### Convert ROS2 mcap to ROS1 bag files
+   The assumption here is that the $HOME/datasets folder from host computer gets mounted to the container at /home/developer/datasets. If it doesn't exist create it and copy the mcap file there and the rosbag file will be generated in the same folder. 
 
-- Review the project documentation in the `docs/` directory
-- Check out the example configurations in `config/`
-- Start with the calibration examples in `data/`
+   ```bash
+   cd src/ikalibr && python3 script/mcap_to_bag.py
+   ```
 
-For more information about development containers, see the [official VS Code documentation](https://code.visualstudio.com/docs/devcontainers/containers). 
+   To confirm all the topics are there and same as the mcap file do a rosbag info - 
 
+   ```bash
+   $ rosbag info /home/developer/datasets/hmnd-data/updated.bag
+   
+   path:        /home/developer/datasets/hmnd-data/updated.bag
+   version:     2.0
+   duration:    23.8s
+   start:       Jul 16 2025 17:48:52.02 (1752688132.02)
+   end:         Jul 16 2025 17:49:15.85 (1752688155.85)
+   size:        282.4 MB
+   messages:    6673
+   compression: none [360/360 chunks]
+   types:       sensor_msgs/CompressedImage [8f7a12909da2c9d3332d540a0977563f]
+               sensor_msgs/Imu             [6a62c6daae103f4ff57a132d6f95cec2]
+   topics:      /head_front_bottom_camera/image/compressed    714 msgs    : sensor_msgs/CompressedImage
+               /head_front_top_camera/image/compressed       715 msgs    : sensor_msgs/CompressedImage
+               /head_left_camera/image/compressed            715 msgs    : sensor_msgs/CompressedImage
+               /head_rear_left_camera/image/compressed       715 msgs    : sensor_msgs/CompressedImage
+               /head_rear_right_camera/image/compressed      715 msgs    : sensor_msgs/CompressedImage
+               /head_right_camera/image/compressed           715 msgs    : sensor_msgs/CompressedImage
+               /imu/data                                    2384 msgs    : sensor_msgs/Imu
+   ```
+
+#### Run iKalibr on this dataset
+   ```bash
+   roslaunch ikalibr ikalibr-prog.launch config_path:=/home/iKalibr/src/ikalibr/config/hmnd/config.yaml
+   ```

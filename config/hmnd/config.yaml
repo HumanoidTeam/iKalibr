@@ -43,19 +43,19 @@ Configor:
       
       - key: "/head_rear_left_camera/image/compressed"
         value:
-          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Type: "SENSOR_IMAGE_COMP_GS"
           Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 25.0 
-          TrackLengthMin: 10
+          Weight: 25.0  # Reduced from 50.0 to make visual factors less dominant
+          TrackLengthMin: 15  # Increased from 10 for more stable tracks
           ScaleSplineType: LIN_POS_SPLINE
       
-      - key: "/head_rear_right_camera/image/compressed"
-        value:
-          Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 25.0
-          TrackLengthMin: 10
-          ScaleSplineType: LIN_POS_SPLINE
+      # - key: "/head_rear_right_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_GS"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
       
       # - key: "/head_right_camera/image/compressed"
       #   value:
@@ -69,15 +69,14 @@ Configor:
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/test-data/updated.bag"
+    BagPath: "/home/developer/datasets/hmnd-data/updated.bag"
     
-    # Time range for calibration (using most of the 23.8s dataset)
-    # You can adjust these based on which part has the best motion
-    BeginTime: 1.0  # Start after 5 seconds to avoid initial settling
-    Duration: 20.0  # Use 10 seconds of data
+    # Adjusted time range for more stable initialization
+    BeginTime: 2.0
+    Duration: 22.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/test-data/ikalibr_with_intrinsics"
+    OutputPath: "/home/developer/datasets/hmnd-data/ikalibr_results"
   
   Prior:
     # Gravity magnitude
@@ -87,24 +86,22 @@ Configor:
     SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/hmnd/prior.yaml"
     
     # Optimize temporal parameters (time offsets)
-    OptTemporalParams: false  # Disable time offset optimization
+    OptTemporalParams: true
     
-    # Time offset optimization range (adjust if needed)
-    TimeOffsetPadding: 0.08
-    
-    # Readout time padding for rolling shutter (not applicable for GS cameras)
-    ReadoutTimePadding: 0.01
+    # Increased padding for more stable optimization
+    TimeOffsetPadding: 0.3  # Increased from 0.15
+    ReadoutTimePadding: 0.02  # Increased from 0.01
     
     # Map downsampling for visualization
-    MapDownSample: 0.03
+    MapDownSample: 0.05
     
-    # B-spline knot spacing (controls optimization accuracy vs speed)
+    # Increased knot spacing for more stable optimization
     KnotTimeDist:
-      SO3Spline: 0.03    # Keep fine rotation control
-      ScaleSpline: 0.03  # Finer scale control for better trajectory estimation
+      SO3Spline: 0.1     # Increased from 0.05
+      ScaleSpline: 0.1   # Increased from 0.05
     
     # Loss function parameters for robust optimization
-    CauchyLossForCameraFactor: 0.1
+    CauchyLossForCameraFactor: 0.5
 
     NDTLiDAROdometer:
       # 0.5 for indoor case and 1.0 for outdoor case

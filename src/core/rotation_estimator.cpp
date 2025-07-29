@@ -79,7 +79,7 @@ void RotationEstimator::Estimate(const So3SplineType &spline,
     Eigen::JacobiSVD svd(AMat, Eigen::ComputeFullU | Eigen::ComputeFullV);
     Eigen::Vector4d cov = svd.singularValues();
 
-    if (cov(2) > 0.25) {
+    if (cov(2) > 0.03) {
         // get result
         Eigen::Matrix<double, 4, 1> x = svd.matrixV().col(3);
         Eigen::Quaterniond quat(x);

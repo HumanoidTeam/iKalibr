@@ -1,0 +1,145 @@
+Configor:
+  DataStream:
+    RadarTopics:
+    LiDARTopics:
+    RGBDTopics:
+    # IMU configuration - using the main IMU topic
+    IMUTopics:
+      - key: "/imu/data"
+        value:
+          Type: "SENSOR_IMU_G"
+          # Using default IMU intrinsics (identity matrix)
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/imu-intrinsics.yaml"
+          # Weights based on typical IMU noise levels
+          # Adjust these based on your specific IMU characteristics
+          AcceWeight: 17.68
+          GyroWeight: 57.66
+    
+    # Camera configuration - all 6 cameras with compressed image format
+    CameraTopics:
+      # - key: "/head_front_bottom_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
+      
+      # - key: "/head_front_top_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
+      
+      # - key: "/head_left_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
+      
+      - key: "/head_rear_left_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+          Weight: 25.0 
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
+      
+      - key: "/head_rear_right_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+          Weight: 25.0
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
+      
+      # - key: "/head_right_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
+    
+    # Reference IMU (main IMU)
+    ReferIMU: "/imu/data"
+    
+    # Path to your converted bag file (cleaned version)
+    BagPath: "/home/developer/datasets/test-data/updated.bag"
+    
+    # Time range for calibration (using most of the 23.8s dataset)
+    # You can adjust these based on which part has the best motion
+    BeginTime: 1.0  # Start after 5 seconds to avoid initial settling
+    Duration: 20.0  # Use 10 seconds of data
+    
+    # Output directory for results
+    OutputPath: "/home/developer/datasets/test-data/ikalibr_with_intrinsics"
+  
+  Prior:
+    # Gravity magnitude
+    GravityNorm: 9.8
+    
+    # Prior spatial-temporal parameters
+    SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/hmnd/prior.yaml"
+    
+    # Optimize temporal parameters (time offsets)
+    OptTemporalParams: false  # Disable time offset optimization
+    
+    # Time offset optimization range (adjust if needed)
+    TimeOffsetPadding: 0.08
+    
+    # Readout time padding for rolling shutter (not applicable for GS cameras)
+    ReadoutTimePadding: 0.01
+    
+    # Map downsampling for visualization
+    MapDownSample: 0.03
+    
+    # B-spline knot spacing (controls optimization accuracy vs speed)
+    KnotTimeDist:
+      SO3Spline: 0.03    # Keep fine rotation control
+      ScaleSpline: 0.03  # Finer scale control for better trajectory estimation
+    
+    # Loss function parameters for robust optimization
+    CauchyLossForCameraFactor: 0.1
+
+    NDTLiDAROdometer:
+      # 0.5 for indoor case and 1.0 for outdoor case
+      Resolution: 0.5
+      KeyFrameDownSample: 0.1
+    
+    LiDARDataAssociate:
+      # leaf size when down sample the map using 'pcl::VoxelGrid' filter
+      # note that this field just for visualization, no connection with calibration
+      # for outdoor, 0.1 is suggested, and for indoor: 0.05 is suggested
+      MapDownSample: 0.05
+      # associate point and surfel when distance is less than this value
+      PointToSurfelMax: 0.1
+      # chose plane as a surfel for data association when planarity is larger than this value
+      PlanarityMin: 0.6
+
+  Preference:
+    # Use CPU for solving (set to true if you have CUDA)
+    UseCudaInSolving: false
+    
+    # Output options for analysis and visualization
+    Outputs:
+      - ParamInEachIter
+      - VisualMaps
+      - VisualLiDARCovisibility
+      - VisualKinematics
+      - AlignedInertialMes
+      - VisualReprojErrors
+    
+    # Output format
+    OutputDataFormat: "YAML"
+    
+    # Use all available CPU threads
+    ThreadsToUse: -1
+    
+    # Viewer settings
+    SplineScaleInViewer: 3.0
+    CoordSScaleInViewer: 0.3 

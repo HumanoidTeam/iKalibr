@@ -18,23 +18,23 @@
 SpatialTemporalPriori:
   SO3_Sen1ToSen2:
     # extrinsic rotation of sensor 'first' with respect to 'second'
-    - key:
-        first: "/livox_avia/imu"
-        second: "/livox_avia/lidar"
-      value:
-        qx: 0.0
-        qy: 0.0
-        qz: 0.0
-        qw: 1.0
+    # - key:
+    #     first: "/livox_avia/imu"
+    #     second: "/livox_avia/lidar"
+    #   value:
+    #     qx: 0.0
+    #     qy: 0.0
+    #     qz: 0.0
+    #     qw: 1.0
   POS_Sen1InSen2:
     # extrinsic translation of sensor 'first' in 'second'
-    - key:
-        first: "/livox_avia/imu"
-        second: "/livox_avia/lidar"
-      value:
-        r0c0: -0.04165
-        r1c0: -0.02326
-        r2c0: 0.02840
+    # - key:
+    #     first: "/livox_avia/imu"
+    #     second: "/livox_avia/lidar"
+    #   value:
+    #     r0c0: -0.04165
+    #     r1c0: -0.02326
+    #     r2c0: 0.02840
   TO_Sen1ToSen2:
   # time offset of sensor 'first' with respect to 'second'
   # - key:

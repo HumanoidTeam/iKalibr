@@ -90,6 +90,9 @@ const std::string Configor::DataStream::DebugPath = PkgPath + "/debug/";
 
 std::string Configor::Prior::SpatTempPrioriPath = {};
 double Configor::Prior::GravityNorm = {};
+double Configor::Prior::GravityDirectionX = 0.0;
+double Configor::Prior::GravityDirectionY = 0.0;
+double Configor::Prior::GravityDirectionZ = -1.0;
 double Configor::Prior::TimeOffsetPadding = {};
 double Configor::Prior::ReadoutTimePadding = {};
 double Configor::Prior::MapDownSample = {};

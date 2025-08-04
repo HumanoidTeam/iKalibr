@@ -20,7 +20,7 @@ Configor:
       # - key: "/head_front_bottom_camera/image/compressed"
       #   value:
       #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
@@ -28,15 +28,7 @@ Configor:
       # - key: "/head_front_top_camera/image/compressed"
       #   value:
       #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
-      #     Weight: 50.0
-      #     TrackLengthMin: 10
-      #     ScaleSplineType: LIN_POS_SPLINE
-      
-      # - key: "/head_left_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
@@ -44,14 +36,22 @@ Configor:
       - key: "/head_rear_left_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_GS"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 25.0  # Reduced from 50.0 to make visual factors less dominant
-          TrackLengthMin: 15  # Increased from 10 for more stable tracks
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
+          Weight: 50.0  
+          TrackLengthMin: 10  
           ScaleSplineType: LIN_POS_SPLINE
       
       # - key: "/head_rear_right_camera/image/compressed"
       #   value:
-      #     Type: "SENSOR_IMAGE_COMP_GS"
+      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
+      
+      # - key: "/head_left_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
       #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
@@ -60,7 +60,7 @@ Configor:
       # - key: "/head_right_camera/image/compressed"
       #   value:
       #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/cam-intri-pinhole-brown.yaml"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
@@ -69,18 +69,21 @@ Configor:
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/hmnd-data/updated.bag"
+    BagPath: "/home/developer/datasets/hmnd-head-on-stick/updated-throttled.bag"
     
     # Adjusted time range for more stable initialization
-    BeginTime: 2.0
-    Duration: 22.0
+    BeginTime: 1.0
+    Duration: 70.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/hmnd-data/ikalibr_results"
+    OutputPath: "/home/developer/datasets/hmnd-head-on-stick/ikalibr_results"
   
   Prior:
     # Gravity magnitude
     GravityNorm: 9.8
+    GravityDirectionX: 0
+    GravityDirectionY: -1
+    GravityDirectionZ: 0
     
     # Prior spatial-temporal parameters
     SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/hmnd/prior.yaml"
@@ -89,19 +92,19 @@ Configor:
     OptTemporalParams: true
     
     # Increased padding for more stable optimization
-    TimeOffsetPadding: 0.3  # Increased from 0.15
-    ReadoutTimePadding: 0.02  # Increased from 0.01
+    TimeOffsetPadding: 0.15  
+    ReadoutTimePadding: 0.01  
     
     # Map downsampling for visualization
-    MapDownSample: 0.05
+    MapDownSample: 0.03
     
     # Increased knot spacing for more stable optimization
     KnotTimeDist:
-      SO3Spline: 0.1     # Increased from 0.05
-      ScaleSpline: 0.1   # Increased from 0.05
+      SO3Spline: 0.05     # Increased from 0.05
+      ScaleSpline: 0.05   # Increased from 0.05
     
     # Loss function parameters for robust optimization
-    CauchyLossForCameraFactor: 0.5
+    CauchyLossForCameraFactor: 1.0
 
     NDTLiDAROdometer:
       # 0.5 for indoor case and 1.0 for outdoor case
@@ -126,9 +129,9 @@ Configor:
     Outputs:
       - ParamInEachIter
       - VisualMaps
-      - VisualLiDARCovisibility
       - VisualKinematics
       - AlignedInertialMes
+      - VisualReprojErrors
       - VisualReprojErrors
     
     # Output format

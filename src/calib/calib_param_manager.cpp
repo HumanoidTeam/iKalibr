@@ -158,8 +158,9 @@ CalibParamManager::Ptr CalibParamManager::InitParamsFromConfigor() {
         }
     }
 
-    // align to the negative 'z' axis
-    parMarg->GRAVITY = Eigen::Vector3d(0.0, 0.0, -Configor::Prior::GravityNorm);
+    // align to the user-specified gravity direction (now using three scalars)
+    Eigen::Vector3d gravity_dir(Configor::Prior::GravityDirectionX, Configor::Prior::GravityDirectionY, Configor::Prior::GravityDirectionZ);
+    parMarg->GRAVITY = Configor::Prior::GravityNorm * gravity_dir.normalized();
 
     spdlog::info("initialize calibration parameter manager using configor finished.");
     return parMarg;

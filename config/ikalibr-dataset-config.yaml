@@ -83,9 +83,10 @@ Configor:
     OutputPath: "/home/developer/datasets/ikalibr-data-1/"
   Prior:
     GravityNorm: 9.8
-    # priori about spatiotemporal parameters, given by corresponding config file path
+    GravityDirectionX: 0
+    GravityDirectionY: 0
+    GravityDirectionZ: -1
     SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/spat-temp-priori.yaml"
-    # if sensor are hardware-synchronized, you could choose to fix temporal parameters by setting this field to 'false'
     OptTemporalParams: true
     # the range where the time offsets would be optimized.
     # make sure this range contains the ground truth of time offsets

@@ -90,7 +90,7 @@ SpatialTemporalPriori:
     #     r1c0: -0.16137
     #     r2c0: 0.03088
     
-    # # head_front_top_camera
+    # head_front_top_camera
     # - key:
     #     first: "/head_front_top_camera/image/compressed"
     #     second: "/imu/data"

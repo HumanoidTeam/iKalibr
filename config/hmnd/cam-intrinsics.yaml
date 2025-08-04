@@ -39,25 +39,24 @@ Intrinsics:
   # the camera model type, supported models are:
   # (1) pinhole_brown_t2: k1, k2, k3, t1, t2
   # (2)  pinhole_fisheye: k1, k2, k3, k4
-  polymorphic_name: pinhole_brown_t2
+  polymorphic_name: pinhole_fisheye
   ptr_wrapper:
     # don't care about this field
     id: 2147483649
     data:
-      img_width: 960
-      img_height: 768
+      img_width: 1920
+      img_height: 1536
       # fx, fy
       focal_length:
-        - 372.4565        
-        - 371.80514
+        - 847.94996        
+        - 846.3685
       # cx, cy
       principal_point:
-        - 480.99767
-        - 384.70584
-      # k1, k2, k3, t1, t2
+        - 951.05805
+        - 766.80436
+      # k1, k2, k3, k4
       disto_param:
-        - -0.029156
-        - -0.009087
-        - -0.001799
-        - 0.000702
-        - 0
+        - 0.708885
+        - -2.839486
+        - 7.793056
+        - -6.944787

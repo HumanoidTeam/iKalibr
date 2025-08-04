@@ -255,6 +255,9 @@ public:
     static struct Prior {
         static std::string SpatTempPrioriPath;
         static double GravityNorm;
+        static double GravityDirectionX;
+        static double GravityDirectionY;
+        static double GravityDirectionZ;
         static constexpr int SplineOrder = 4;
         static bool OptTemporalParams;
         static double TimeOffsetPadding;
@@ -317,6 +320,7 @@ public:
         template <class Archive>
         void serialize(Archive &ar) {
             ar(CEREAL_NVP(SpatTempPrioriPath), CEREAL_NVP(GravityNorm),
+               CEREAL_NVP(GravityDirectionX), CEREAL_NVP(GravityDirectionY), CEREAL_NVP(GravityDirectionZ),
                CEREAL_NVP(OptTemporalParams), CEREAL_NVP(TimeOffsetPadding),
                CEREAL_NVP(ReadoutTimePadding), CEREAL_NVP(MapDownSample),
                cereal::make_nvp("KnotTimeDist", knotTimeDist),

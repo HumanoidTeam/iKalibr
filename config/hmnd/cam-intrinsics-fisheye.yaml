@@ -35,46 +35,28 @@
 Intrinsics:
   # polymorphic pointers point to a base class and also point to objects of derived classes
   # don't care about this field
+  polymorphic_id: 2147483649
+  # the camera model type, supported models are:
+  # (1) pinhole_brown_t2: k1, k2, k3, t1, t2
+  # (2)  pinhole_fisheye: k1, k2, k3, k4
+  polymorphic_name: pinhole_fisheye
   ptr_wrapper:
+    # don't care about this field
     id: 2147483649
     data:
-      ACCE:
-        # 3-dime constant bias vector of the accelerator
-        BIAS:
-          r0c0: 0.007290586230356258
-          r1c0: -0.01410767045335331
-          r2c0: 0.01273570567924998
-        # mapping matrix, composed of scale factors and non-orthogonality factors
-        # [      s_x,  gamma_xy, gamma_xz;
-        #  -gamma_xy,       s_y, gamma_yz;
-        #  -gamma_xz, -gamma_yz,      z_z]
-        MAP_COEFF:
-          r0c0: 1
-          r1c0: 1
-          r2c0: 1
-          r3c0: 0
-          r4c0: 0
-          r5c0: 0
-      GYRO:
-        # 3-dime constant bias vector of the gyroscope
-        BIAS:
-          r0c0: 0.0004568513828345717
-          r1c0: -0.005965362810238514
-          r2c0: 0.008145008134733791
-        # mapping matrix, composed of scale factors and non-orthogonality factors
-        # [      s_x,  gamma_xy, gamma_xz;
-        #  -gamma_xy,       s_y, gamma_yz;
-        #  -gamma_xz, -gamma_yz,      z_z]
-        MAP_COEFF:
-          r0c0: 1
-          r1c0: 1
-          r2c0: 1
-          r3c0: 0
-          r4c0: 0
-          r5c0: 0
-      # rotation misalignment between the accelerator and the gyroscope (from frame {A} to frame {G})
-      SO3_AtoG:
-        qx: 0
-        qy: 0
-        qz: 0
-        qw: 1
+      img_width: 1920
+      img_height: 1536
+      # fx, fy
+      focal_length:
+        - 828.61827        
+        - 829.21278
+      # cx, cy
+      principal_point:
+        - 907.60997
+        - 789.98827
+      # k1, k2, k3, k4
+      disto_param:
+        - -0.024492
+        - -0.023715
+        - 0.060417 
+        - -0.034951

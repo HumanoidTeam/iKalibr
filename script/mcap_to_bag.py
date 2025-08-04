@@ -225,8 +225,10 @@ def create_compressed_image_message(data, timestamp, topic):
         print(f"[ERROR] Failed to create compressed image message for {topic}: {e}")
         return None
 
-def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None):
+def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_rate=1):
     print(f"Converting {mcap_path} to {bag_path}")
+    print(f"Image passthrough rate: {image_rate} (1/{image_rate} messages)")
+    print(f"IMU passthrough rate: {imu_rate} (1/{imu_rate} messages)")
     if csv_path:
         print(f"Also exporting IMU data to {csv_path}")
     
@@ -255,6 +257,7 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None):
         failed_topics = set()
         successful_conversions = defaultdict(int)
         skipped_msgs = defaultdict(int)
+        message_counters = defaultdict(int)  # Track messages per topic for rate control
 
         print(f"Found {len(topic_type_map)} topics to convert:")
         for topic, msg_type in topic_type_map.items():
@@ -281,6 +284,22 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None):
             timestamp = rospy.Time.from_sec(message.log_time / 1e9)
             msg = None
             
+            # Increment message counter for this topic
+            message_counters[topic] += 1
+            
+            # Determine if we should process this message based on rate control
+            should_process = False
+            if 'CompressedImage' in ros1_type:
+                should_process = (message_counters[topic] % image_rate) == 0
+            elif 'Imu' in ros1_type:
+                should_process = (message_counters[topic] % imu_rate) == 0
+            else:
+                should_process = True  # Always process other message types
+                
+            if not should_process:
+                skipped_msgs[topic] += 1
+                continue
+                
             # Handle CompressedImage messages
             if 'CompressedImage' in ros1_type:
                 msg = create_compressed_image_message(message.data, timestamp, topic)
@@ -323,26 +342,40 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None):
 
 if __name__ == "__main__":
     # Default paths
-    default_mcap = "/home/developer/datasets/hmnd-data/record_test1_0.mcap"
-    default_bag = "/home/developer/datasets/hmnd-data/updated.bag"
-    default_csv = "/home/developer/datasets/hmnd-data/updated.csv"
+    default_mcap = "/home/developer/datasets/hmnd-head-on-stick/eight3_0.mcap"
+    default_bag = "/home/developer/datasets/hmnd-head-on-stick/updated.bag"
+    default_csv = "/home/developer/datasets/hmnd-head-on-stick/updated-thrott.csv"
     
-    if len(sys.argv) < 3:
-        print(f"Using default paths:")
-        print(f"  MCAP: {default_mcap}")
-        print(f"  BAG:  {default_bag}")
-        print(f"  CSV:  {default_csv}")
-        print(f"\nTo use custom paths: python3 mcap_to_bag_fixed_offsets.py <input.mcap> <output.bag> [output_imu.csv]")
-        
-        mcap_path = os.path.abspath(os.path.expandvars(os.path.expanduser(default_mcap)))
-        bag_path = os.path.abspath(os.path.expandvars(os.path.expanduser(default_bag)))
-        csv_path = os.path.abspath(os.path.expandvars(os.path.expanduser(default_csv)))
-    else:
-        mcap_path = os.path.abspath(os.path.expandvars(os.path.expanduser(sys.argv[1])))
-        bag_path = os.path.abspath(os.path.expandvars(os.path.expanduser(sys.argv[2])))
-        csv_path = None
-        if len(sys.argv) > 3:
-            csv_path = os.path.abspath(os.path.expandvars(os.path.expanduser(sys.argv[3])))
+    import argparse
+    parser = argparse.ArgumentParser(description='Convert MCAP file to ROS bag with rate control')
+    parser.add_argument('--mcap', default=default_mcap, help='Input MCAP file path')
+    parser.add_argument('--bag', default=default_bag, help='Output ROS bag file path')
+    parser.add_argument('--csv', default=default_csv, help='Output CSV file path for IMU data')
+    parser.add_argument('--image-rate', type=int, default=1, help='Image passthrough rate (1/N messages)')
+    parser.add_argument('--imu-rate', type=int, default=1, help='IMU passthrough rate (1/N messages)')
+    
+    # Support both positional and named arguments for backward compatibility
+    parser.add_argument('mcap_pos', nargs='?', help='Input MCAP file path (positional)')
+    parser.add_argument('bag_pos', nargs='?', help='Output ROS bag file path (positional)')
+    parser.add_argument('csv_pos', nargs='?', help='Output CSV file path (positional)')
+    
+    args = parser.parse_args()
+    
+    # Use positional arguments if provided, otherwise use named arguments
+    mcap_path = os.path.abspath(os.path.expandvars(os.path.expanduser(
+        args.mcap_pos if args.mcap_pos else args.mcap)))
+    bag_path = os.path.abspath(os.path.expandvars(os.path.expanduser(
+        args.bag_pos if args.bag_pos else args.bag)))
+    csv_path = os.path.abspath(os.path.expandvars(os.path.expanduser(
+        args.csv_pos if args.csv_pos else args.csv))) if (args.csv_pos or args.csv) else None
+    
+    # Validate rate parameters
+    if args.image_rate < 1:
+        print("Error: Image rate must be >= 1")
+        sys.exit(1)
+    if args.imu_rate < 1:
+        print("Error: IMU rate must be >= 1")
+        sys.exit(1)
     
     print(f"Resolved MCAP path: {mcap_path}")
     print(f"Resolved BAG path: {bag_path}")
@@ -353,4 +386,4 @@ if __name__ == "__main__":
         print(f"Error: MCAP file {mcap_path} does not exist")
         sys.exit(1)
     
-    convert_mcap_to_bag(mcap_path, bag_path, csv_path) 
+    convert_mcap_to_bag(mcap_path, bag_path, csv_path, args.image_rate, args.imu_rate)

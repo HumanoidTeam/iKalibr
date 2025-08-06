@@ -101,42 +101,64 @@ def try_deserialize_ros2(msg_class, data):
         return None
 
 def create_imu_message_from_raw_data(data, timestamp, topic):
-    """Create IMU message by manually parsing the raw data"""
+    """Create IMU message by manually parsing the raw data - pass through as-is from MCAP"""
     try:
         from sensor_msgs.msg import Imu
         from geometry_msgs.msg import Quaternion, Vector3
+        import struct
         
         msg = Imu()
         msg.header.stamp = timestamp
-        msg.header.frame_id = "cv7_link"  # Default frame ID
+        msg.header.frame_id = "head_imu"  # Use actual frame ID from data
         
         # Find the frame_id string to locate the actual data
-        import struct
         frame_id_start = 16
-        frame_id_length = struct.unpack('<I', data[12:16])[0]  # 9 bytes
+        frame_id_length = struct.unpack('<I', data[12:16])[0]
         
         # Skip frame_id and find where actual IMU data starts
-        data_start = frame_id_start + frame_id_length + (4 - (frame_id_length % 4)) % 4  # Align to 4-byte boundary
+        data_start = frame_id_start + frame_id_length + (4 - (frame_id_length % 4)) % 4
         
-        # Parse quaternion (4 doubles = 32 bytes)
+        # Based on the MCAP message structure analysis, parse all fields correctly:
+        # Orientation quaternion (4 doubles = 32 bytes) - starts at data_start
         qx = struct.unpack('<d', data[data_start:data_start+8])[0]
         qy = struct.unpack('<d', data[data_start+8:data_start+16])[0]
         qz = struct.unpack('<d', data[data_start+16:data_start+24])[0]
         qw = struct.unpack('<d', data[data_start+24:data_start+32])[0]
         
-        # Parse angular velocity (3 doubles = 24 bytes)
-        av_start = data_start + 32
-        avx = struct.unpack('<d', data[av_start:av_start+8])[0]
-        avy = struct.unpack('<d', data[av_start+8:av_start+16])[0]
-        avz = struct.unpack('<d', data[av_start+16:av_start+24])[0]
+        # Orientation covariance (9 doubles = 72 bytes) - starts at data_start + 32
+        orientation_cov_start = data_start + 32
+        orientation_covariance = []
+        for i in range(9):
+            cov_val = struct.unpack('<d', data[orientation_cov_start + i*8:orientation_cov_start + (i+1)*8])[0]
+            orientation_covariance.append(cov_val)
         
-        # Parse linear acceleration (3 doubles = 24 bytes)
-        la_start = av_start + 24
-        lax = struct.unpack('<d', data[la_start:la_start+8])[0]
-        lay = struct.unpack('<d', data[la_start+8:la_start+16])[0]
-        laz = struct.unpack('<d', data[la_start+16:la_start+24])[0]
+        # Angular velocity (3 doubles = 24 bytes) - starts at data_start + 104
+        angular_vel_start = data_start + 104
+        avx = struct.unpack('<d', data[angular_vel_start:angular_vel_start+8])[0]
+        avy = struct.unpack('<d', data[angular_vel_start+8:angular_vel_start+16])[0]
+        avz = struct.unpack('<d', data[angular_vel_start+16:angular_vel_start+24])[0]
         
-        # Set the message fields
+        # Angular velocity covariance (9 doubles = 72 bytes) - starts at data_start + 128
+        angular_vel_cov_start = data_start + 128
+        angular_velocity_covariance = []
+        for i in range(9):
+            cov_val = struct.unpack('<d', data[angular_vel_cov_start + i*8:angular_vel_cov_start + (i+1)*8])[0]
+            angular_velocity_covariance.append(cov_val)
+        
+        # Linear acceleration (3 doubles = 24 bytes) - starts at data_start + 200
+        linear_acc_start = data_start + 200
+        lax = struct.unpack('<d', data[linear_acc_start:linear_acc_start+8])[0]
+        lay = struct.unpack('<d', data[linear_acc_start+8:linear_acc_start+16])[0]
+        laz = struct.unpack('<d', data[linear_acc_start+16:linear_acc_start+24])[0]
+        
+        # Linear acceleration covariance (9 doubles = 72 bytes) - starts at data_start + 224
+        linear_acc_cov_start = data_start + 224
+        linear_acceleration_covariance = []
+        for i in range(9):
+            cov_val = struct.unpack('<d', data[linear_acc_cov_start + i*8:linear_acc_cov_start + (i+1)*8])[0]
+            linear_acceleration_covariance.append(cov_val)
+        
+        # Set all message fields directly from parsed data - no modifications
         msg.orientation.x = qx
         msg.orientation.y = qy
         msg.orientation.z = qz
@@ -150,15 +172,17 @@ def create_imu_message_from_raw_data(data, timestamp, topic):
         msg.linear_acceleration.y = lay
         msg.linear_acceleration.z = laz
         
-        # Set covariance matrices to identity
-        msg.orientation_covariance = [0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01]
-        msg.angular_velocity_covariance = [0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01]
-        msg.linear_acceleration_covariance = [0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01]
+        # Use the actual covariance values from the MCAP data
+        msg.orientation_covariance = orientation_covariance
+        msg.angular_velocity_covariance = angular_velocity_covariance
+        msg.linear_acceleration_covariance = linear_acceleration_covariance
         
         return msg
             
     except Exception as e:
         print(f"[DEBUG] Failed to create IMU message: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 def validate_jpeg(data):

@@ -17,13 +17,13 @@ Configor:
     
     # Camera configuration - all 6 cameras with compressed image format
     CameraTopics:
-      # - key: "/head_front_bottom_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-      #     Weight: 50.0
-      #     TrackLengthMin: 10
-      #     ScaleSplineType: LIN_POS_SPLINE
+      - key: "/head_front_bottom_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+          Weight: 50.0
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
       
       # - key: "/head_front_top_camera/image/compressed"
       #   value:
@@ -33,21 +33,21 @@ Configor:
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
       
-      - key: "/head_rear_left_camera/image/compressed"
-        value:
-          Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 50.0  
-          TrackLengthMin: 10  
-          ScaleSplineType: LIN_POS_SPLINE
+      # - key: "/head_rear_left_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+      #     Weight: 50.0  
+      #     TrackLengthMin: 10  
+      #     ScaleSplineType: LIN_POS_SPLINE
       
-      - key: "/head_rear_right_camera/image/compressed"
-        value:
-          Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 50.0
-          TrackLengthMin: 10
-          ScaleSplineType: LIN_POS_SPLINE
+      # - key: "/head_rear_right_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
       
       # - key: "/head_left_camera/image/compressed"
       #   value:
@@ -69,14 +69,14 @@ Configor:
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/hmnd-head-on-stick/updated-throttled.bag"
+    BagPath: "/home/developer/datasets/hmnd-head-on-stick/test_fixed_img3.bag"
     
     # Adjusted time range for more stable initialization
     BeginTime: 1.0
     Duration: 70.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/hmnd-head-on-stick/ikalibr_check_intrinsics"
+    OutputPath: "/home/developer/datasets/hmnd-head-on-stick/ikalibr_output"
   
   Prior:
     # Gravity magnitude
@@ -100,8 +100,8 @@ Configor:
     
     # Increased knot spacing for more stable optimization
     KnotTimeDist:
-      SO3Spline: 0.05     
-      ScaleSpline: 0.05
+      SO3Spline: 0.1      # Increased to match image interval
+      ScaleSpline: 0.1    # Increased to match image interval
     
     # Loss function parameters for robust optimization
     CauchyLossForCameraFactor: 0.5

@@ -87,7 +87,8 @@ void CalibSolver::InitSensorInertialAlign() const {
         // lidar extrinsic translations
         OptOption::OPT_POS_LkInBr |
         // camera extrinsic translations and visual scale
-        OptOption::OPT_POS_CmInBr | OptOption::OPT_VISUAL_GLOBAL_SCALE |
+        // OptOption::OPT_POS_CmInBr | OptOption::OPT_VISUAL_GLOBAL_SCALE |
+        OptOption::OPT_POS_CmInBr |
         // event camera extrinsic translation
         OptOption::OPT_POS_EsInBr |
         // radar extrinsics

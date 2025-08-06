@@ -36,6 +36,8 @@
 #include "calib/calib_param_manager.h"
 #include "calib/ceres_callback.h"
 #include "calib/estimator.h"
+#include "calib/gravity_utils.hpp"
+#include "config/configor.h"
 #include "calib/spat_temp_priori.h"
 #include "core/colmap_data_io.h"
 #include "core/optical_flow_trace.h"
@@ -281,9 +283,13 @@ void CalibSolver::AlignStatesToGravity() const {
     auto &so3Spline = _splines->GetSo3Spline(Configor::Preference::SO3_SPLINE);
     auto &scaleSpline = _splines->GetRdSpline(Configor::Preference::SCALE_SPLINE);
     // current gravity, velocities, and rotations are expressed in the reference frame
-    // align them to the world frame whose negative z axis is aligned with the gravity vector
+    // align them to the world frame with the configured gravity direction
+    Eigen::Vector3d targetDir(Configor::Prior::GravityDirectionX,
+                            Configor::Prior::GravityDirectionY,
+                            Configor::Prior::GravityDirectionZ);
+    targetDir.normalize();
     auto SO3_RefToW =
-        ObtainAlignedWtoRef(so3Spline.Evaluate(so3Spline.MinTime()), _parMagr->GRAVITY).inverse();
+        ObtainAlignedWtoRef(so3Spline.Evaluate(so3Spline.MinTime()), _parMagr->GRAVITY, targetDir).inverse();
     _parMagr->GRAVITY = SO3_RefToW * _parMagr->GRAVITY;
     for (int i = 0; i < static_cast<int>(so3Spline.GetKnots().size()); ++i) {
         so3Spline.GetKnot(i) = SO3_RefToW * so3Spline.GetKnot(i);

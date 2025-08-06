@@ -7,7 +7,7 @@ Configor:
     IMUTopics:
       - key: "/imu/data"
         value:
-          Type: "SENSOR_IMU_G"
+          Type: "SENSOR_IMU"
           # Using default IMU intrinsics (identity matrix)
           Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/imu-intrinsics.yaml"
           # Weights based on typical IMU noise levels
@@ -20,7 +20,7 @@ Configor:
       # - key: "/head_front_bottom_camera/image/compressed"
       #   value:
       #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
@@ -28,31 +28,31 @@ Configor:
       # - key: "/head_front_top_camera/image/compressed"
       #   value:
       #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
       
       - key: "/head_rear_left_camera/image/compressed"
         value:
-          Type: "SENSOR_IMAGE_COMP_GS"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
           Weight: 50.0  
           TrackLengthMin: 10  
           ScaleSplineType: LIN_POS_SPLINE
       
-      # - key: "/head_rear_right_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
-      #     Weight: 50.0
-      #     TrackLengthMin: 10
-      #     ScaleSplineType: LIN_POS_SPLINE
+      - key: "/head_rear_right_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+          Weight: 50.0
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
       
       # - key: "/head_left_camera/image/compressed"
       #   value:
       #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
@@ -60,7 +60,7 @@ Configor:
       # - key: "/head_right_camera/image/compressed"
       #   value:
       #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
       #     Weight: 50.0
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
@@ -76,7 +76,7 @@ Configor:
     Duration: 70.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/hmnd-head-on-stick/ikalibr_results"
+    OutputPath: "/home/developer/datasets/hmnd-head-on-stick/ikalibr_check_intrinsics"
   
   Prior:
     # Gravity magnitude
@@ -100,11 +100,11 @@ Configor:
     
     # Increased knot spacing for more stable optimization
     KnotTimeDist:
-      SO3Spline: 0.05     # Increased from 0.05
-      ScaleSpline: 0.05   # Increased from 0.05
+      SO3Spline: 0.05     
+      ScaleSpline: 0.05
     
     # Loss function parameters for robust optimization
-    CauchyLossForCameraFactor: 1.0
+    CauchyLossForCameraFactor: 0.5
 
     NDTLiDAROdometer:
       # 0.5 for indoor case and 1.0 for outdoor case

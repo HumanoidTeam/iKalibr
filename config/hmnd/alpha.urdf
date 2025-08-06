@@ -1,0 +1,1201 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="alpha_wheelbase">
+  <link name="base_link">
+    <inertial>
+      <origin xyz="-0.005 0.00586233325851 0.294" rpy="0 0 0" />
+      <mass value="121.770511523669" />
+      <inertia ixx="4.35850849459001" ixy="-0.109698692564727" ixz="0.00118870322780746" iyy="3.62810895426757" iyz="-0.00111963347949171" izz="7.89887029637625" />
+    </inertial>
+    <visual>
+      <origin xyz="0.254698192661 -2.27942664744e-15 0.989027300322" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/base_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0.254698192661 -2.27942664744e-15 0.989027300322" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 .33" rpy="0 0 0" />
+      <geometry>
+        <box size="0.63 0.68 0.02" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 0.36 .18" rpy="0 0 0" />
+      <geometry>
+        <box size="0.65 0.02 0.3" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.33 0 .18" rpy="0 0 1.5708" />
+      <geometry>
+        <box size="0.67 0.02 0.3" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0 -0.36 .18" rpy="0 0 0" />
+      <geometry>
+        <box size="0.65 0.02 0.3" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="-0.33 0 .18" rpy="0 0 1.5708" />
+      <geometry>
+        <box size="0.67 0.02 0.3" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="base_yaw_link">
+    <inertial>
+      <origin xyz="6.31567267928013E-08 -0.0141263507350381 0.136472273306037" rpy="0 0 0" />
+      <mass value="25.19" />
+      <inertia ixx="0.09504355528989487" ixy="-1.7584955096811334e-06" ixz="-3.747302034812952e-09" iyy="0.09492229455622817" iyz="-4.432459105682726e-06" izz="0.10571641909309189" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/base_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/base_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="base_yaw_joint" type="continuous">
+    <origin xyz="-0.0003418073388 -2.27942664744e-15 0.225357300322" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="base_yaw_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-31.416" upper="31.416" effort="281" velocity="2.0944" />
+  </joint>
+  <link name="base_pitch_link">
+    <inertial>
+      <origin xyz="-0.205013582469966 1.38118405601517E-11 -0.119634208355339" rpy="0 0 0" />
+      <mass value="25.19" />
+      <inertia ixx="0.08497291825670492" ixy="5.046507251064538e-08" ixz="0.0002867802370033229" iyy="0.1378365813620668" iyz="-3.274803910071296e-09" izz="0.14458375536906232" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/base_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/base_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="base_pitch_joint" type="revolute">
+    <origin xyz="0 0.121 0.215" rpy="-1.5708 0 0" />
+    <parent link="base_yaw_link" />
+    <child link="base_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="1.5707" effort="281" velocity="2.0944" />
+  </joint>
+  <link name="knee_pitch_link">
+    <inertial>
+      <origin xyz="0.278428401555688 -0.0111677548433884 -0.156803429635043" rpy="0 0 0" />
+      <mass value="20.38" />
+      <inertia ixx="0.08670654709173208" ixy="-2.6796859198367583e-05" ixz="0.0004420791791662136" iyy="0.5716582414846235" iyz="5.6349077693786316e-08" izz="0.5676479162188556" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/knee_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/knee_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0.22 0 -0.16" rpy="0 0 0" />
+      <geometry>
+        <box size="0.44 0.17 0.365" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="knee_pitch_joint" type="revolute">
+    <origin xyz="-0.255 0 0.0383" rpy="0 0 0" />
+    <parent link="base_pitch_link" />
+    <child link="knee_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-3.1416" upper="0" effort="562" velocity="2.0944" />
+  </joint>
+  <link name="hip_pitch_link">
+    <inertial>
+      <origin xyz="-4.8914E-08 -0.061339 0.1691" rpy="0 0 0" />
+      <mass value="26.11" />
+      <inertia ixx="0.11147481271929824" ixy="1.5986649122807018e-07" ixz="-3.4759510087719295e-06" iyy="0.11909824561403508" iyz="8.326341578947367e-06" izz="0.09874504254385964" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/hip_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/hip_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 -0.1 0.145" rpy="0 0 0" />
+      <geometry>
+        <box size="0.1 0.2 0.25" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="hip_pitch_joint" type="revolute">
+    <origin xyz="0.51 0 -0.3073" rpy="0 0 0" />
+    <parent link="knee_pitch_link" />
+    <child link="hip_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="1.5707" effort="281" velocity="2.0944" />
+  </joint>
+  <link name="torso_yaw_link">
+    <inertial>
+      <origin xyz="0.00998035689244812 3.14316958730646E-06 0.179069733418531" rpy="0 0 0" />
+      <mass value="12" />
+      <inertia ixx="0.061036060111288384" ixy="-1.2235096014747757e-06" ixz="0.0001463211923356257" iyy="0.06061727599950042" iyz="-3.910975436992941e-06" izz="0.04217482922104914" />
+      <!-- mass with battery
+      <mass value="30.0004140411251" />
+      <inertia ixx="0.152592256231471" ixy="-3.05881621896127E-06" ixz="0.000365808029421656" iyy="0.151545281502514" iyz="-9.7775735345382E-06" izz="0.105438528228768" />
+      -->
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/torso_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/torso_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz=".01 0 0.22" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.38" radius="0.12" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="torso_yaw_joint" type="revolute">
+    <origin xyz="0 -0.2143 0.148" rpy="1.5708 0 0" />
+    <parent link="hip_pitch_link" />
+    <child link="torso_yaw_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5708" upper="3.1416" effort="281" velocity="2.0944" />
+  </joint>
+  <link name="left_bicep_pitch_link">
+    <inertial>
+      <origin xyz="-0.00574432583221793 -2.93796807086695E-05 0.0610085781411935" rpy="0 0 0" />
+      <mass value="2.00336" />
+      <inertia ixx="0.0029910123514420715" ixy="5.092363402535622e-07" ixz="-1.068865452114382e-07" iyy="0.0027745304256810723" iyz="-3.0356402984566995e-06" izz="0.002473435983258482" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_bicep_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_bicep_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="-0.007 0 0.06" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.06" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_shoulder_pitch_joint" type="revolute">
+    <origin xyz="0.007935 0.13579 0.34831" rpy="-0.1745 -1.3963 -1.3963" />
+    <parent link="torso_yaw_link" />
+    <child link="left_bicep_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5708" upper="2.0944" effort="96" velocity="3.926991" />
+  </joint>
+  <link name="left_bicep_roll_link">
+    <inertial>
+      <origin xyz="-0.0346059535692716 -0.00197523722952841 0.0149938033399721" rpy="0 0 0" />
+      <mass value="0.61185" />
+      <inertia ixx="0.0011238479900797737" ixy="-1.5984780531974447e-05" ixz="0.0003264907284366053" iyy="0.001246968781172688" iyz="3.7655964911066586e-05" izz="0.0013057312392883564" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_bicep_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_bicep_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="left_shoulder_roll_joint" type="revolute">
+    <origin xyz="-0.047807 0 0.0652" rpy="-1.5708 -0.17453 -1.5708" />
+    <parent link="left_bicep_pitch_link" />
+    <child link="left_bicep_roll_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="2.0944" effort="96" velocity="3.926991" />
+  </joint>
+  <link name="left_bicep_yaw_link">
+    <inertial>
+      <origin xyz="-0.000690018428339906 -0.000651965070160909 -0.0908905743395086" rpy="0 0 0" />
+      <mass value="3.57395" />
+      <inertia ixx="0.007000125033595214" ixy="6.04752055127793e-06" ixz="2.872468880560568e-05" iyy="0.006300838553779784" iyz="0.00017641322871479094" izz="0.004706120860325115" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_bicep_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_bicep_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 -0.09" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.07" radius="0.05" />
+      </geometry>
+    </collision>
+    <collision_checking>
+      <capsule name="left_bicep_yaw_link" />
+    </collision_checking>
+  </link>
+  <joint name="left_shoulder_yaw_joint" type="revolute">
+    <origin xyz="-0.0702 0 0.047748" rpy="3.1416 -1.5708 0" />
+    <parent link="left_bicep_roll_link" />
+    <child link="left_bicep_yaw_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.3963" upper="1.3963" effort="44" velocity="6.283185" />
+  </joint>
+  <link name="left_forearm_pitch_link">
+    <inertial>
+      <origin xyz="-0.00020872020216071 0.0258796863639824 -0.000644773172702923" rpy="0 0 0" />
+      <mass value="1.06901" />
+      <inertia ixx="0.0010073386720538724" ixy="-5.189073018424937e-06" ixz="5.361143256349123e-07" iyy="0.0009718291255070072" iyz="-3.908209010018983e-06" izz="0.0008153019685242681" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_forearm_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_forearm_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0.025 0" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_elbow_pitch_joint" type="revolute">
+    <origin xyz="0 0 -0.1948" rpy="-1.5708 0 0" />
+    <parent link="left_bicep_yaw_link" />
+    <child link="left_forearm_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.9199" upper="0" effort="44" velocity="6.283185" />
+  </joint>
+  <link name="left_forearm_yaw_link">
+    <inertial>
+      <origin xyz="-6.57442722185554E-05 -0.000454739866572657 -0.0876117533176937" rpy="0 0 0" />
+      <mass value="2.59872" />
+      <inertia ixx="0.008147740322000586" ixy="-1.0371944252622204e-06" ixz="3.1308607635620212e-06" iyy="0.007571649034063873" iyz="0.00033404968662069547" izz="0.0026092545782523055" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_forearm_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_forearm_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 -0.06" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.07" radius="0.05" />
+      </geometry>
+    </collision>
+    <collision_checking>
+      <capsule name="left_forearm_yaw_link" />
+    </collision_checking>
+  </link>
+  <joint name="left_elbow_yaw_joint" type="revolute">
+    <origin xyz="0 0.0604 -0.0005" rpy="1.5708 0 0" />
+    <parent link="left_forearm_pitch_link" />
+    <child link="left_forearm_yaw_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.3963" upper="1.3963" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="left_hand_pitch_link">
+    <inertial>
+      <origin xyz="0.00136793090861426 0.000568845360776282 0.0167499330870852" rpy="0 0 0" />
+      <mass value="0.30108" />
+      <inertia ixx="0.0001579643993481491" ixy="-3.952848623730765e-06" ixz="-7.590718483189575e-11" iyy="0.00016886438475155642" iyz="-1.3586343008153112e-10" izz="0.0001464062402464334" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_hand_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_hand_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="-0.015 0 0.015" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.02" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_wrist_pitch_joint" type="revolute">
+    <origin xyz="0 -0.01675 -0.186" rpy="-1.5708 0 0" />
+    <parent link="left_forearm_yaw_link" />
+    <child link="left_hand_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.8727" upper="0.8727" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="left_hand_roll_link">
+    <inertial>
+      <origin xyz="-0.124406442665607 0.00865519780880669 -0.0354390786191912" rpy="0 0 0" />
+      <mass value="1.88444" />
+      <inertia ixx="0.0008874887120271336" ixy="-2.606557553169422e-05" ixz="-4.683861061106644e-05" iyy="0.0013703830346756096" iyz="-1.1631586945411212e-07" izz="0.001184854329094334" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_hand_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/left_hand_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="-0.1 0.0003 -0.038" rpy="0 1.5708 0" />
+      <geometry>
+        <cylinder length="0.03" radius="0.037" />
+      </geometry>
+    </collision>
+    <collision_checking>
+      <capsule name="left_hand_roll_link" />
+    </collision_checking>
+    <collision>
+      <origin xyz="-0.136 0.05231 -0.037" rpy="0 1.5708 0.087" />
+      <geometry>
+        <box size="0.08 0.01 0.1" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_wrist_roll_joint" type="revolute">
+    <origin xyz="0.038 0 0.01675" rpy="-1.5708 0 -1.5708" />
+    <parent link="left_hand_pitch_link" />
+    <child link="left_hand_roll_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.4363" upper="0.4363" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="left_gripper_frame"/>
+  <joint name="left_gripper_frame_joint" type="fixed">
+    <origin xyz="-0.113 0 -0.03978" rpy="0 -1.5708 0" />
+    <parent link="left_hand_roll_link" />
+    <child link="left_gripper_frame" />
+  </joint>
+  <link name="left_finger_frame"/>
+  <joint name="left_finger_frame_joint" type="fixed">
+    <origin xyz="-0.23 0 -0.03978" rpy="0 -1.5708 0" />
+    <parent link="left_hand_roll_link" />
+    <child link="left_finger_frame" />
+  </joint>
+  <link name="left_pad_frame"/>
+  <joint name="left_pad_frame_joint" type="fixed">
+    <origin xyz="-0.14 0.055 -0.03978" rpy="-1.5708 -1.5708 0" />
+    <parent link="left_hand_roll_link" />
+    <child link="left_pad_frame" />
+  </joint>
+  <link name="right_bicep_pitch_link">
+    <inertial>
+      <origin xyz="-0.00574375893864991 -2.88803006877857E-05 -0.0610082209525503" rpy="0 0 0" />
+      <mass value="2.00336" />
+      <inertia ixx="0.002991027777893482" ixy="5.030016872197532e-07" ixz="6.164160017531313e-08" iyy="0.00277451335780715" iyz="3.0109276460092225e-06" izz="0.0024734565543693206" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_bicep_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_bicep_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="-0.007 0 -0.06" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.06" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_shoulder_pitch_joint" type="revolute">
+    <origin xyz="0.007935 -0.13579 0.34831" rpy="0.1745 -1.7453 -1.7453" />
+    <parent link="torso_yaw_link" />
+    <child link="right_bicep_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5708" upper="2.0944" effort="96" velocity="3.926991" />
+  </joint>
+  <link name="right_bicep_roll_link">
+    <inertial>
+      <origin xyz="-0.0346058591859523 0.00197567007234012 0.0149934875845301" rpy="0 0 0" />
+      <mass value="0.61185" />
+      <inertia ixx="0.0011238492471962668" ixy="1.598856876349577e-05" ixz="0.0003264913270372355" iyy="0.0012469714481539715" iyz="-3.7646045610635174e-05" izz="0.001305734162267451" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_bicep_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_bicep_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="right_shoulder_roll_joint" type="revolute">
+    <origin xyz="-0.047807 0 -0.0652" rpy="-1.5708 0.17453 -1.5708" />
+    <parent link="right_bicep_pitch_link" />
+    <child link="right_bicep_roll_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.0944" upper="0" effort="96" velocity="3.926991" />
+  </joint>
+  <link name="right_bicep_yaw_link">
+    <inertial>
+      <origin xyz="-0.000690019982963665 0.000651917075408404 -0.091090626036794" rpy="0 0 0" />
+      <mass value="3.57395" />
+      <inertia ixx="0.0070001296982456366" ixy="-6.044340873387167e-06" ixz="2.8722641729577606e-05" iyy="0.006300839982928658" iyz="-0.000176411003530543" izz="0.0047061249121481364" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_bicep_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_bicep_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 -0.09" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.07" radius="0.05" />
+      </geometry>
+    </collision>
+    <collision_checking>
+      <capsule name="right_bicep_yaw_link" />
+    </collision_checking>
+  </link>
+  <joint name="right_shoulder_yaw_joint" type="revolute">
+    <origin xyz="-0.07 0 0.047748" rpy="3.1416 -1.5708 0" />
+    <parent link="right_bicep_roll_link" />
+    <child link="right_bicep_yaw_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.3963" upper="1.3963" effort="44" velocity="6.283185" />
+  </joint>
+  <link name="right_forearm_pitch_link">
+    <inertial>
+      <origin xyz="-0.000208664053729349 0.0258797354545606 0.000644617234282968" rpy="0 0 0" />
+      <mass value="1.06901" />
+      <inertia ixx="0.0010073346416574844" ixy="-5.1899007974370295e-06" ixz="-5.259357182574568e-07" iyy="0.0009718291312319654" iyz="3.911043185449248e-06" izz="0.00081530409989985" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_forearm_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_forearm_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0.01 0" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_elbow_pitch_joint" type="revolute">
+    <origin xyz="0 0 -0.195" rpy="-1.5708 0 0" />
+    <parent link="right_bicep_yaw_link" />
+    <child link="right_forearm_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.9199" upper="0" effort="44" velocity="6.283185" />
+  </joint>
+  <link name="right_forearm_yaw_link">
+    <inertial>
+      <origin xyz="-6.55480449236459E-05 0.000454704411513962 -0.0876116806091557" rpy="0 0 0" />
+      <mass value="2.59872" />
+      <inertia ixx="0.008147735312727214" ixy="1.0335449153879658e-06" ixz="3.141406717607691e-06" iyy="0.007571649683527629" iyz="-0.00033404729126940505" izz="0.0026092523463519457" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_forearm_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_forearm_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 -0.06" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.07" radius="0.05" />
+      </geometry>
+    </collision>
+    <collision_checking>
+      <capsule name="right_forearm_yaw_link" />
+    </collision_checking>
+  </link>
+  <joint name="right_elbow_yaw_joint" type="revolute">
+    <origin xyz="0 0.0604 0.0005" rpy="1.5708 0 0" />
+    <parent link="right_forearm_pitch_link" />
+    <child link="right_forearm_yaw_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.3963" upper="1.3963" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="right_hand_pitch_link">
+    <inertial>
+      <origin xyz="0.00136793474958333 0.000568866718743732 -0.0167500803423749" rpy="0 0 0" />
+      <mass value="0.30108" />
+      <inertia ixx="0.00015796518703080706" ixy="-3.952700220439799e-06" ixz="-7.27968238763024e-10" iyy="0.00016886524281404334" iyz="-4.1399390664710376e-10" izz="0.00014640695505948982" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_hand_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_hand_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="-0.015 0 -0.015" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.02" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_wrist_pitch_joint" type="revolute">
+    <origin xyz="0 0.01675 -0.186" rpy="-1.5708 0 0" />
+    <parent link="right_forearm_yaw_link" />
+    <child link="right_hand_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.8727" upper="0.8727" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="right_hand_roll_link">
+    <inertial>
+      <origin xyz="-0.124406547803359 -0.00721937330141686 -0.0369451835523874" rpy="0 0 0" />
+      <mass value="1.88444" />
+      <inertia ixx="0.0008874661085257656" ixy="2.5772914160583867e-05" ixz="-4.6328031260022526e-05" iyy="0.001370027059757635" iyz="-2.232202703524766e-07" izz="0.0011851872340594449" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_hand_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/right_hand_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="-0.1 0.0015 -0.039" rpy="0 1.5708 0" />
+      <geometry>
+        <cylinder length="0.03" radius="0.037" />
+      </geometry>
+    </collision>
+    <collision_checking>
+      <capsule name="right_hand_roll_link" />
+    </collision_checking>
+    <collision>
+      <origin xyz="-0.136 -0.0503 -0.039" rpy="0 1.5708 -0.087" />
+      <geometry>
+        <box size="0.08 0.01 0.1" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_wrist_roll_joint" type="revolute">
+    <origin xyz="0.03978 0 -0.015307" rpy="-1.5708 0 -1.5708" />
+    <parent link="right_hand_pitch_link" />
+    <child link="right_hand_roll_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.4363" upper="0.4363" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="right_gripper_frame"/>
+  <joint name="right_gripper_frame_joint" type="fixed">
+    <origin xyz="-0.113 0 -0.03978" rpy="0 -1.5708 0" />
+    <parent link="right_hand_roll_link" />
+    <child link="right_gripper_frame" />
+  </joint>
+  <link name="right_finger_frame"/>
+  <joint name="right_finger_frame_joint" type="fixed">
+    <origin xyz="-0.23 0 -0.03978" rpy="0 -1.5708 0" />
+    <parent link="right_hand_roll_link" />
+    <child link="right_finger_frame" />
+  </joint>
+  <link name="right_pad_frame"/>
+  <joint name="right_pad_frame_joint" type="fixed">
+    <origin xyz="-0.14 -0.055 -0.03978" rpy="1.5708 -1.5708 0" />
+    <parent link="right_hand_roll_link" />
+    <child link="right_pad_frame" />
+  </joint>
+  <link name="head_yaw_link">
+    <inertial>
+      <origin xyz="-3.03638183684028E-05 -0.00062703584201352 0.0466702385576361" rpy="0 0 0" />
+      <mass value="0.964901230141391" />
+      <inertia ixx="0.000602141297418993" ixy="8.3253981768727E-07" ixz="-5.66923048954387E-07" iyy="0.000682093118883121" iyz="2.39044656833751E-05" izz="0.000600276354553336" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/head_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1.0 1.0 1.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/head_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 0.015" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.03" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="neck_yaw_joint" type="revolute">
+    <origin xyz="0.0175 0 0.42897" rpy="0 0 0" />
+    <parent link="torso_yaw_link" />
+    <child link="head_yaw_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.0472" upper="1.0472" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="head_pitch_link">
+    <inertial>
+      <origin xyz="0.0282220269196679 -0.14641919154188 0.0286873655574812" rpy="0 0 0" />
+      <mass value="4.1462526365395" />
+      <inertia ixx="0.0237396360598703" ixy="-3.13743888062157E-05" ixz="-4.44455362612753E-05" iyy="0.0131279128313575" iyz="5.25682737231843E-05" izz="0.0172873559342706" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/head_pitch_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.0 0.0 0.0 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/head_pitch_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0.035 -0.135 0.03" rpy="1.5708 0 0" />
+      <geometry>
+        <cylinder length="0.07" radius="0.08" />
+      </geometry>
+    </collision>
+    <collision_checking>
+      <capsule name="head_pitch_link" />
+    </collision_checking>
+  </link>
+  <joint name="neck_pitch_joint" type="revolute">
+    <origin xyz="0 -0.0299 0.0501" rpy="-1.5708 0 0" />
+    <parent link="head_yaw_link" />
+    <child link="head_pitch_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.3491" upper="0.7854" effort="16" velocity="3.926991" />
+  </joint>
+  <link name="head_front_top_camera"/>
+  <joint name="head_front_top_camera_joint" type="fixed">
+    <origin xyz="0.1125 -0.202 0.0299" rpy="3.5256 -1.5708 0" />
+    <parent link="head_pitch_link" />
+    <child link="head_front_top_camera" />
+  </joint>
+  <link name="head_front_bottom_camera"/>
+  <joint name="head_front_bottom_camera_joint" type="fixed">
+    <origin xyz="0.09065 -0.04854 0.0299" rpy="-1.5708 1.5708 -1.0123" />
+    <parent link="head_pitch_link" />
+    <child link="head_front_bottom_camera" />
+  </joint>
+  <link name="head_rear_right_camera"/>
+  <joint name="head_rear_right_camera_joint" type="fixed">
+    <origin xyz="-0.0465 -0.16 -0.0151" rpy="-1.5708 -1.5708 1.2392" />
+    <parent link="head_pitch_link" />
+    <child link="head_rear_right_camera" />
+  </joint>
+  <link name="head_rear_left_camera"/>
+  <joint name="head_rear_left_camera_joint" type="fixed">
+    <origin xyz="-0.0465 -0.16 0.0749" rpy="-1.5708 -1.5708 1.2392" />
+    <parent link="head_pitch_link" />
+    <child link="head_rear_left_camera" />
+  </joint>
+  <link name="head_right_camera"/>
+  <joint name="head_right_camera_joint" type="fixed">
+    <origin xyz="0.02855 -0.195 -0.0451" rpy="-2.7925 0 0" />
+    <parent link="head_pitch_link" />
+    <child link="head_right_camera" />
+  </joint>
+  <link name="head_left_camera"/>
+  <joint name="head_left_camera_joint" type="fixed">
+    <origin xyz="0.02855 -0.195 0.1049" rpy="0.3491 0 3.1416" />
+    <parent link="head_pitch_link" />
+    <child link="head_left_camera" />
+  </joint>
+  <link name="head_front_tof_camera"/>
+  <joint name="head_front_tof_camera_joint" type="fixed">
+    <origin xyz="0.10577 -0.08145 0.0299" rpy="0.5236 -1.5708 -3.1416" />
+    <parent link="head_pitch_link" />
+    <child link="head_front_tof_camera" />
+  </joint>
+  <link name="head_rear_tof_camera"/>
+  <joint name="head_rear_tof_camera_joint" type="fixed">
+    <origin xyz="-0.05297 -0.10618 0.0299" rpy="3.4907 1.5708 0" />
+    <parent link="head_pitch_link" />
+    <child link="head_rear_tof_camera" />
+  </joint>
+  <link name="head_imu"/>
+  <joint name="head_imu_joint" type="fixed">
+    <origin xyz="0.0015 -0.20991 -0.00098" rpy="0 0 3.1416" />
+    <parent link="head_pitch_link" />
+    <child link="head_imu" />
+  </joint>
+  <link name="wheel_front_left_yaw_link">
+    <inertial>
+      <origin xyz="-0.00151581104324147 -2.69231739208342E-07 -0.0424805915910244" rpy="0 0 0" />
+      <mass value="1.49997905204779" />
+      <inertia ixx="0.00180302797518226" ixy="9.15025078254429E-10" ixz="-5.30775314868901E-05" iyy="0.00233946355813513" iyz="-1.02759741585585E-09" izz="0.0017627675340193" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_left_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_left_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="wheel_front_left_yaw_joint" type="continuous">
+    <origin xyz="0.226625192661 0.239 0.117357300322" rpy="0 0 1.5708" />
+    <parent link="base_link" />
+    <child link="wheel_front_left_yaw_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="wheel_front_left_roll_link">
+    <inertial>
+      <origin xyz="-1.06163699664652E-06 3.77941868356935E-08 -0.00416828495879912" rpy="0 0 0" />
+      <mass value="0.90650070556726" />
+      <inertia ixx="0.000849012751388775" ixy="5.48935747167317E-10" ixz="-5.72616998734048E-10" iyy="0.000849090869317309" iyz="7.29239647528767E-10" izz="0.0014608575274819" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_left_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 0.937254901960784 0.137254901960784 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_left_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 -0.007" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.05" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="wheel_front_left_roll_joint" type="continuous">
+    <origin xyz="-0.007 0 -0.06055" rpy="0 -1.5708 0" />
+    <parent link="wheel_front_left_yaw_link" />
+    <child link="wheel_front_left_roll_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="wheel_front_right_yaw_link">
+    <inertial>
+      <origin xyz="-0.00151581104322276 -2.69231740235298E-07 -0.0424805915910249" rpy="0 0 0" />
+      <mass value="1.4999790520478" />
+      <inertia ixx="0.00180302797518226" ixy="9.15025077513857E-10" ixz="-5.30775314868912E-05" iyy="0.00233946355813512" iyz="-1.02759741770779E-09" izz="0.0017627675340193" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_right_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_right_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="wheel_front_right_yaw_joint" type="continuous">
+    <origin xyz="0.226625192661 -0.239 0.117357300322" rpy="0 0 1.5708" />
+    <parent link="base_link" />
+    <child link="wheel_front_right_yaw_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="wheel_front_right_roll_link">
+    <inertial>
+      <origin xyz="1.01908274519058E-06 -2.99955081856096E-07 -0.00416828495881495" rpy="0 0 0" />
+      <mass value="0.906500705580469" />
+      <inertia ixx="0.000849017821813343" ixy="1.92531365731042E-08" ixz="3.73829587718816E-10" iyy="0.000849085798892315" iyz="-8.48487226718842E-10" izz="0.0014608575274814" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_right_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 0.937254901960784 0.137254901960784 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_front_right_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+        <collision>
+      <origin xyz="0 0 -0.007" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.05" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="wheel_front_right_roll_joint" type="continuous">
+    <origin xyz="-0.007 0 -0.06055" rpy="0 -1.5708 0" />
+    <parent link="wheel_front_right_yaw_link" />
+    <child link="wheel_front_right_roll_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="wheel_rear_left_yaw_link">
+    <inertial>
+      <origin xyz="-0.00151581104324239 -2.69231737681785E-07 -0.0424805915910244" rpy="0 0 0" />
+      <mass value="1.49997905204779" />
+      <inertia ixx="0.00180302797518225" ixy="9.15025062852059E-10" ixz="-5.30775314868924E-05" iyy="0.00233946355813511" iyz="-1.02759741842291E-09" izz="0.0017627675340193" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_left_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.698039215686274 0.698039215686274 0.698039215686274 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_left_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="wheel_rear_left_yaw_joint" type="continuous">
+    <origin xyz="-0.231371807339 0.239 0.117357300322" rpy="0 0 1.5708" />
+    <parent link="base_link" />
+    <child link="wheel_rear_left_yaw_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="wheel_rear_left_roll_link">
+    <inertial>
+      <origin xyz="-1.06163699764572E-06 3.77941844764695E-08 -0.00416828495880306" rpy="0 0 0" />
+      <mass value="0.906500705567262" />
+      <inertia ixx="0.000849012751388775" ixy="5.48935749015895E-10" ixz="-5.72617014982123E-10" iyy="0.000849090869317308" iyz="7.2923964874705E-10" izz="0.0014608575274819" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_left_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 0.937254901960784 0.137254901960784 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_left_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 -0.007" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.05" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="wheel_rear_left_roll_joint" type="continuous">
+    <origin xyz="-0.007 0 -0.06055" rpy="0 -1.5708 0" />
+    <parent link="wheel_rear_left_yaw_link" />
+    <child link="wheel_rear_left_roll_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="wheel_rear_right_yaw_link">
+    <inertial>
+      <origin xyz="-0.0015158 -2.6919E-07 -0.042481" rpy="0 0 0" />
+      <mass value="1.5" />
+      <inertia ixx="0.001803" ixy="9.1821E-10" ixz="-5.3078E-05" iyy="0.0023395" iyz="-1.0262E-09" izz="0.0017628" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_right_yaw_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.69804 0.69804 0.69804 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_right_yaw_link.STL" />
+      </geometry>
+    </collision>
+    -->
+  </link>
+  <joint name="wheel_rear_right_yaw_joint" type="continuous">
+    <origin xyz="-0.231371807339 -0.239 0.117357300322" rpy="0 0 1.5708" />
+    <parent link="base_link" />
+    <child link="wheel_rear_right_yaw_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <link name="wheel_rear_right_roll_link">
+    <inertial>
+      <origin xyz="-7.6081E-07 -7.414E-07 -0.0041683" rpy="0 0 0" />
+      <mass value="0.9065" />
+      <inertia ixx="0.00084905" ixy="-3.9044E-08" ixz="-9.2282E-10" iyy="0.00084905" iyz="8.9858E-11" izz="0.0014609" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_right_roll_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="1 0.93725 0.13725 1" />
+      </material>
+    </visual>
+    <!-- tag left in for high quality contacts in simulation
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://alpha_wheelbase_description/meshes/wheel_rear_right_roll_link.STL" />
+      </geometry>
+    </collision>
+    -->
+    <collision>
+      <origin xyz="0 0 -0.007" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.04" radius="0.05" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="wheel_rear_right_roll_joint" type="continuous">
+    <origin xyz="-0.007 0 -0.06055" rpy="0 -1.5708 0" />
+    <parent link="wheel_rear_right_yaw_link" />
+    <child link="wheel_rear_right_roll_link" />
+    <axis xyz="0 0 1" />
+  </joint>
+</robot>

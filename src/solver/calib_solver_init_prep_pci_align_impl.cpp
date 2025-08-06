@@ -88,65 +88,19 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
         const auto rotEstimator = RotationEstimator::Create();
 
         bar = std::make_shared<tqdm>();
-        auto prevTimestamp = -1.0;
-        int prevFrameId = -1;
+        // auto prevTimestamp = -1.0;
+        // int prevFrameId = -1;
         for (int i = 0; i < static_cast<int>(frameVec.size()); ++i) {
-            const auto& frame = frameVec.at(i);
-            double currTimestamp = frame->GetTimestamp();
-            int currFrameId = frame->GetId();
-            // Log timestamp and time difference
-            if (prevTimestamp >= 0) {
-                double dt = currTimestamp - prevTimestamp;
-                spdlog::info("Frame {}: timestamp = {:.6f}, dt = {:.6f}", currFrameId, currTimestamp, dt);
-                if (dt > 0.05) {
-                    spdlog::warn("Frame {}: Large time gap from previous frame: {:.6f} s", currFrameId, dt);
-                }
-                if (currFrameId != prevFrameId + 1) {
-                    spdlog::warn("Frame {}: Non-consecutive frame id (prev: {}, curr: {})", i, prevFrameId, currFrameId);
-                }
-            } else {
-                spdlog::info("Frame {}: timestamp = {:.6f} (first frame)", currFrameId, currTimestamp);
-            }
-            prevTimestamp = currTimestamp;
-            prevFrameId = currFrameId;
+            bar->progress(i, static_cast<int>(frameVec.size()));
 
-            // Feature tracking
-            if (!odometer->GrabFrame(frame)) {
-                spdlog::warn("tracking failed when grab the '{}' image frame!!! try to reinitialize", i);
-            }
-            // Log number of features tracked
-            auto pack = odometer->GetLastTrackedFeaturePack();
-            int nFeatures = pack ? pack->featMatchLast2Cur.size() : 0;
-            spdlog::info("Frame {}: {} features tracked", currFrameId, nFeatures);
-            if (nFeatures < 50) {
-                spdlog::warn("Frame {}: Low number of tracked features: {}", currFrameId, nFeatures);
-            }
-            // Compute and log displacement of tracked features (mean and max)
-            std::vector<double> displacements;
-            if (pack) {
-                for (const auto& [idLast, idCur] : pack->featMatchLast2Cur) {
-                    auto itLast = pack->featLast.find(idLast);
-                    auto itCur = pack->featCur.find(idCur);
-                    if (itLast != pack->featLast.end() && itCur != pack->featCur.end()) {
-                        const auto& ptLast = itLast->second->raw;
-                        const auto& ptCur = itCur->second->raw;
-                        double dx = ptCur.x - ptLast.x;
-                        double dy = ptCur.y - ptLast.y;
-                        displacements.push_back(std::sqrt(dx*dx + dy*dy));
-                    }
-                }
-            }
-            if (!displacements.empty()) {
-                double mean_disp = std::accumulate(displacements.begin(), displacements.end(), 0.0) / displacements.size();
-                double max_disp = *std::max_element(displacements.begin(), displacements.end());
-                spdlog::info("Frame {}: mean feature displacement = {:.2f} px, max = {:.2f} px", currFrameId, mean_disp, max_disp);
-                if (max_disp > 50.0) {
-                    spdlog::warn("Frame {}: Large feature displacement detected: max = {:.2f} px", currFrameId, max_disp);
-                }
+            // if tracking current frame failed, the rotation-only odometer would re-initialize
+            if (!odometer->GrabFrame(frameVec.at(i))) {
+                spdlog::warn(
+                    "tracking failed when grab the '{}' image frame!!! try to reinitialize", i);
             }
 
             // we do not want to try to recover the extrinsic rotation too frequent
-            if ((odometer->GetRotations().size() < 450) ||
+            if ((odometer->GetRotations().size() < 500) ||
                 (odometer->GetRotations().size() % 5 != 0)) {
                 continue;
             }

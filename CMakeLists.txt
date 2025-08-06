@@ -238,6 +238,7 @@ target_link_libraries(
         # thirdparty
         ctraj
         veta
+        ${PROJECT_NAME}_config
 )
 
 #####################

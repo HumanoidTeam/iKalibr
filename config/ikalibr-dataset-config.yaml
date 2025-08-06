@@ -120,7 +120,7 @@ Configor:
     # the loss function used for lidar factor (m)
     CauchyLossForLiDARFactor: 0.5
     # the loss function used for visual reprojection factor (pixel)
-    CauchyLossForCameraFactor: 1.0
+    CauchyLossForCameraFactor: 0.1
   Preference:
     # whether using cuda to speed up when solving least-squares problems
     UseCudaInSolving: false

@@ -47,7 +47,8 @@ void CalibSolver::InitPrepBatchOpt() const {
     /**
      * align initialized states to gravity direction
      */
-    spdlog::info("states are already aligned with configured gravity direction...");
+    spdlog::info("aligning all states to gravity direction...");
+    AlignStatesToGravity();
     _viewer->UpdateSplineViewer();
 
     /**

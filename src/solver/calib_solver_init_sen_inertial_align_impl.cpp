@@ -73,12 +73,6 @@ void CalibSolver::InitSensorInertialAlign() const {
 
     auto estimator = Estimator::Create(_splines, _parMagr);
 
-    // Add gravity direction constraint from config
-    Eigen::Vector3d gravity_dir(Configor::Prior::GravityDirectionX,
-                              Configor::Prior::GravityDirectionY,
-                              Configor::Prior::GravityDirectionZ);
-    estimator->AddGravityDirectionConstraint(gravity_dir, 1000.0);  // High weight to enforce constraint
-
     /**
      * we do not optimization the already initialized extrinsic rotations (IMUs', Cameras', and
      * LiDARs') here
@@ -87,8 +81,7 @@ void CalibSolver::InitSensorInertialAlign() const {
         // lidar extrinsic translations
         OptOption::OPT_POS_LkInBr |
         // camera extrinsic translations and visual scale
-        // OptOption::OPT_POS_CmInBr | OptOption::OPT_VISUAL_GLOBAL_SCALE |
-        OptOption::OPT_POS_CmInBr |
+        OptOption::OPT_POS_CmInBr | OptOption::OPT_VISUAL_GLOBAL_SCALE |
         // event camera extrinsic translation
         OptOption::OPT_POS_EsInBr |
         // radar extrinsics

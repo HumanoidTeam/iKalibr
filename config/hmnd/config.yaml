@@ -69,21 +69,21 @@ Configor:
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/hmnd-head-on-stick/test_fixed_img3.bag"
+    BagPath: "/home/developer/datasets/hmnd-head-on-stick-2/updated.bag"
     
     # Adjusted time range for more stable initialization
     BeginTime: 1.0
     Duration: 70.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/hmnd-head-on-stick/ikalibr_output"
+    OutputPath: "/home/developer/datasets/hmnd-head-on-stick-2/ikalibr_output"
   
   Prior:
     # Gravity magnitude
     GravityNorm: 9.8
     GravityDirectionX: 0
-    GravityDirectionY: -1
-    GravityDirectionZ: 0
+    GravityDirectionY: 0
+    GravityDirectionZ: 1
     
     # Prior spatial-temporal parameters
     SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/hmnd/prior.yaml"

@@ -44,16 +44,16 @@ Intrinsics:
     # don't care about this field
     id: 2147483649
     data:
-      img_width: 1920
-      img_height: 1536
+      img_width: 960
+      img_height: 768
       # fx, fy
       focal_length:
-        - 730.3765015423841        
-        - 730.3765015423841
+        - 365.18825077119205
+        - 365.18825077119205
       # cx, cy
       principal_point:
-        - 916.5823512148371
-        - 767.0221013218494
+        - 458.29117560741854
+        - 383.5110506609247
       # k1, k2, k3, k4
       disto_param:
         - 0.3223585060986506

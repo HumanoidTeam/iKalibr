@@ -251,6 +251,9 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
     auto sum = estimator->Solve(_ceresOption, this->_priori);
     spdlog::info("here is the summary:\n{}\n", sum.BriefReport());
 
+    // align states to the gravity after the batch optimization is finished
+    AlignStatesToGravity();
+
     // for better map consistency in visualization, we update the veta every time
     for (const auto &[topic, reprojCorrVec] : visualReprojCorrs) {
         auto &veta = _dataMagr->GetSfMData(topic);

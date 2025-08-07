@@ -366,16 +366,16 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_ra
 
 if __name__ == "__main__":
     # Default paths
-    default_mcap = "/home/developer/datasets/hmnd-head-on-stick/eight3_0.mcap"
-    default_bag = "/home/developer/datasets/hmnd-head-on-stick/updated.bag"
-    default_csv = "/home/developer/datasets/hmnd-head-on-stick/updated-thrott.csv"
+    default_mcap = "/home/developer/datasets/hmnd-head-on-stick-2/eight4_0_vcs_0.mcap"
+    default_bag = "/home/developer/datasets/hmnd-head-on-stick-2/updated.bag"
+    default_csv = "/home/developer/datasets/hmnd-head-on-stick-2/updated.csv"
     
     import argparse
     parser = argparse.ArgumentParser(description='Convert MCAP file to ROS bag with rate control')
     parser.add_argument('--mcap', default=default_mcap, help='Input MCAP file path')
     parser.add_argument('--bag', default=default_bag, help='Output ROS bag file path')
     parser.add_argument('--csv', default=default_csv, help='Output CSV file path for IMU data')
-    parser.add_argument('--image-rate', type=int, default=1, help='Image passthrough rate (1/N messages)')
+    parser.add_argument('--image-rate', type=int, default=3, help='Image passthrough rate (1/N messages)')
     parser.add_argument('--imu-rate', type=int, default=1, help='IMU passthrough rate (1/N messages)')
     
     # Support both positional and named arguments for backward compatibility

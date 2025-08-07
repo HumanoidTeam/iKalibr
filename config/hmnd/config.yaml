@@ -21,7 +21,7 @@ Configor:
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
           Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 50.0
+          Weight: 25.0
           TrackLengthMin: 10
           ScaleSplineType: LIN_POS_SPLINE
       
@@ -33,21 +33,21 @@ Configor:
       #     TrackLengthMin: 10
       #     ScaleSplineType: LIN_POS_SPLINE
       
-      # - key: "/head_rear_left_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-      #     Weight: 50.0  
-      #     TrackLengthMin: 10  
-      #     ScaleSplineType: LIN_POS_SPLINE
+      - key: "/head_rear_left_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+          Weight: 25.0  
+          TrackLengthMin: 10  
+          ScaleSplineType: LIN_POS_SPLINE
       
-      # - key: "/head_rear_right_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-      #     Weight: 50.0
-      #     TrackLengthMin: 10
-      #     ScaleSplineType: LIN_POS_SPLINE
+      - key: "/head_rear_right_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
+          Weight: 25.0
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
       
       # - key: "/head_left_camera/image/compressed"
       #   value:
@@ -83,7 +83,7 @@ Configor:
     GravityNorm: 9.8
     GravityDirectionX: 0
     GravityDirectionY: 0
-    GravityDirectionZ: 1
+    GravityDirectionZ: -1
     
     # Prior spatial-temporal parameters
     SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/hmnd/prior.yaml"
@@ -100,11 +100,11 @@ Configor:
     
     # Increased knot spacing for more stable optimization
     KnotTimeDist:
-      SO3Spline: 0.1      # Increased to match image interval
-      ScaleSpline: 0.1    # Increased to match image interval
+      SO3Spline: 0.05      # Increased to match image interval
+      ScaleSpline: 0.05    # Increased to match image interval
     
     # Loss function parameters for robust optimization
-    CauchyLossForCameraFactor: 0.5
+    CauchyLossForCameraFactor: 1
 
     NDTLiDAROdometer:
       # 0.5 for indoor case and 1.0 for outdoor case

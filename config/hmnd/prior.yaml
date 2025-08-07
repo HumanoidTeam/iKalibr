@@ -1,157 +1,143 @@
 SpatialTemporalPriori:
   SO3_Sen1ToSen2:
-    # head_front_bottom_camera (already exists, keeping for reference)
-    - key:
-        first: "/head_front_bottom_camera/image/compressed"
-        second: "/imu/data"
-      value:
-        qx: -0.67971503
-        qy: -0.19490401
-        qz: 0.67971403
-        qw: -0.19490701
-    
     # # head_front_top_camera
     # - key:
     #     first: "/head_front_top_camera/image/compressed"
     #     second: "/imu/data"
     #   value:
-    #     qx: -0.13493
-    #     qy: 0.69411
-    #     qz: -0.13493
-    #     qw: -0.69411
-    
-    # head_rear_right_camera
-    # - key:
-    #     first: "/head_rear_right_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: 0.69741 
-    #     qy: -0.1167
-    #     qz: 0.69741
-    #     qw: 0.11671
-    
-    # head_rear_left_camera
-    # - key:
-    #     first: "/head_rear_left_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: 0.69741 
-    #     qy: -0.1167
-    #     qz: 0.69741
-    #     qw: 0.11671
-    
-    # # head_right_camera
-    # - key:
-    #     first: "/head_right_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: -0.0
-    #     qy: -0.98481
-    #     qz: 0.17366
-    #     qw: 0.0
-    
-    # # head_left_camera
-    # - key:
-    #     first: "/head_left_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: -0.17366
-    #     qy: 0.0
-    #     qz: -0.0
-    #     qw: -0.9848
-    
-    # head_front_tof_camera
-    # - key:
-    #     first: "/head_front_tof_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: 0.18301
-    #     qy: -0.68302
-    #     qz: 0.18301
-    #     qw: 0.68301
-    
-    # head_rear_tof_camera
-    # - key:
-    #     first: "/head_rear_tof_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: 0.12281
-    #     qy: 0.69636
-    #     qz: -0.1228
-    #     qw: 0.69636
-
-  POS_Sen1InSen2:
-    # head_front_bottom_camera (already exists, keeping for reference)
+    #     qx: 0.58622
+    #     qy: 0.58623
+    #     qz: 0.3954
+    #     qw: 0.3954
+    # head_front_bottom_camera
     - key:
         first: "/head_front_bottom_camera/image/compressed"
         second: "/imu/data"
       value:
-        r0c0: -0.08915
-        r1c0: -0.16137
-        r2c0: 0.03088
-    
-    # head_front_top_camera
-    # - key:
-    #     first: "/head_front_top_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: -0.111
-    #     r1c0: -0.00791
-    #     r2c0: 0.03088
-    
+        qx: -0.61845
+        qy: 0.61845
+        qz: -0.34281
+        qw: 0.34281
     # head_rear_right_camera
-    # - key:
-    #     first: "/head_rear_right_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: 0.048
-    #     r1c0: -0.04991
-    #     r2c0: -0.01412
-    
+    - key:
+        first: "/head_rear_right_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        qx: -0.57566
+        qy: -0.57566
+        qz: 0.41062
+        qw: 0.41062
     # head_rear_left_camera
-    # - key:
-    #     first: "/head_rear_left_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: 0.048
-    #     r1c0: -0.04991
-    #     r2c0: 0.07588
-    
+    - key:
+        first: "/head_rear_left_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        qx: -0.57566
+        qy: -0.57566
+        qz: 0.41062
+        qw: 0.41062
     # # head_right_camera
     # - key:
     #     first: "/head_right_camera/image/compressed"
     #     second: "/imu/data"
     #   value:
-    #     r0c0: -0.02705
-    #     r1c0: -0.01491
-    #     r2c0: -0.04412
-    
+    #     qx: -0.81916
+    #     qy: 0.0
+    #     qz: 0.0
+    #     qw: -0.57357
     # # head_left_camera
     # - key:
     #     first: "/head_left_camera/image/compressed"
     #     second: "/imu/data"
     #   value:
-    #     r0c0: -0.02705
-    #     r1c0: -0.01491
-    #     r2c0: 0.10588
-    
+    #     qx: 0.0
+    #     qy: 0.81916
+    #     qz: 0.57356
+    #     qw: -0.0
     # # head_front_tof_camera
     # - key:
     #     first: "/head_front_tof_camera/image/compressed"
     #     second: "/imu/data"
     #   value:
-    #     r0c0: -0.10427
-    #     r1c0: -0.12846
-    #     r2c0: 0.03088
-    
+    #     qx: -0.61237
+    #     qy: -0.61237
+    #     qz: -0.35355
+    #     qw: -0.35356
     # # head_rear_tof_camera
     # - key:
     #     first: "/head_rear_tof_camera/image/compressed"
     #     second: "/imu/data"
     #   value:
-    #     r0c0: 0.05447
-    #     r1c0: -0.10373
-    #     r2c0: 0.03088
+    #     qx: 0.57923
+    #     qy: -0.57924
+    #     qz: -0.40557
+    #     qw: 0.40557
+
+  POS_Sen1InSen2:
+    # # head_front_top_camera
+    # - key:
+    #     first: "/head_front_top_camera/image/compressed"
+    #     second: "/imu/data"
+    #   value:
+    #     r0c0: 0.111
+    #     r1c0: 0.03088
+    #     r2c0: -0.00791
+    # head_front_bottom_camera
+    - key:
+        first: "/head_front_bottom_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        r0c0: 0.08915
+        r1c0: 0.03088
+        r2c0: -0.16137
+    # head_rear_right_camera
+    - key:
+        first: "/head_rear_right_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        r0c0: -0.048
+        r1c0: -0.01412
+        r2c0: -0.04991
+    # head_rear_left_camera
+    - key:
+        first: "/head_rear_left_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        r0c0: -0.048
+        r1c0: 0.07588
+        r2c0: -0.04991
+    # # head_right_camera
+    # - key:
+    #     first: "/head_right_camera/image/compressed"
+    #     second: "/imu/data"
+    #   value:
+    #     r0c0: 0.02705
+    #     r1c0: -0.04412
+    #     r2c0: -0.01491
+    # # head_left_camera
+    # - key:
+    #     first: "/head_left_camera/image/compressed"
+    #     second: "/imu/data"
+    #   value:
+    #     r0c0: 0.02705
+    #     r1c0: 0.10588
+    #     r2c0: -0.01491
+    # # head_front_tof_camera
+    # - key:
+    #     first: "/head_front_tof_camera/image/compressed"
+    #     second: "/imu/data"
+    #   value:
+    #     r0c0: 0.10427
+    #     r1c0: 0.03088
+    #     r2c0: -0.12846
+    # # head_rear_tof_camera
+    # - key:
+    #     first: "/head_rear_tof_camera/image/compressed"
+    #     second: "/imu/data"
+    #   value:
+    #     r0c0: -0.05447
+    #     r1c0: 0.03088
+    #     r2c0: -0.10373
 
   TO_Sen1ToSen2: []
   RS_READOUT: [] 

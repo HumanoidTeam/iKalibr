@@ -1,14 +1,14 @@
 SpatialTemporalPriori:
   SO3_Sen1ToSen2:
-    # # head_front_top_camera
-    # - key:
-    #     first: "/head_front_top_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: 0.58622
-    #     qy: 0.58623
-    #     qz: 0.3954
-    #     qw: 0.3954
+    # head_front_top_camera
+    - key:
+        first: "/head_front_top_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        qx: 0.58622
+        qy: 0.58623
+        qz: 0.3954
+        qw: 0.3954
     # head_front_bottom_camera
     - key:
         first: "/head_front_bottom_camera/image/compressed"
@@ -36,52 +36,34 @@ SpatialTemporalPriori:
         qy: -0.57566
         qz: 0.41062
         qw: 0.41062
-    # # head_right_camera
-    # - key:
-    #     first: "/head_right_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: -0.81916
-    #     qy: 0.0
-    #     qz: 0.0
-    #     qw: -0.57357
-    # # head_left_camera
-    # - key:
-    #     first: "/head_left_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: 0.0
-    #     qy: 0.81916
-    #     qz: 0.57356
-    #     qw: -0.0
-    # # head_front_tof_camera
-    # - key:
-    #     first: "/head_front_tof_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: -0.61237
-    #     qy: -0.61237
-    #     qz: -0.35355
-    #     qw: -0.35356
-    # # head_rear_tof_camera
-    # - key:
-    #     first: "/head_rear_tof_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     qx: 0.57923
-    #     qy: -0.57924
-    #     qz: -0.40557
-    #     qw: 0.40557
+    # head_right_camera
+    - key:
+        first: "/head_right_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        qx: -0.81916
+        qy: 0.0
+        qz: 0.0
+        qw: -0.57357
+    # head_left_camera
+    - key:
+        first: "/head_left_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        qx: 0.0
+        qy: 0.81916
+        qz: 0.57356
+        qw: -0.0
 
   POS_Sen1InSen2:
-    # # head_front_top_camera
-    # - key:
-    #     first: "/head_front_top_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: 0.111
-    #     r1c0: 0.03088
-    #     r2c0: -0.00791
+    # head_front_top_camera
+    - key:
+        first: "/head_front_top_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        r0c0: 0.111
+        r1c0: 0.03088
+        r2c0: -0.00791
     # head_front_bottom_camera
     - key:
         first: "/head_front_bottom_camera/image/compressed"
@@ -106,38 +88,22 @@ SpatialTemporalPriori:
         r0c0: -0.048
         r1c0: 0.07588
         r2c0: -0.04991
-    # # head_right_camera
-    # - key:
-    #     first: "/head_right_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: 0.02705
-    #     r1c0: -0.04412
-    #     r2c0: -0.01491
-    # # head_left_camera
-    # - key:
-    #     first: "/head_left_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: 0.02705
-    #     r1c0: 0.10588
-    #     r2c0: -0.01491
-    # # head_front_tof_camera
-    # - key:
-    #     first: "/head_front_tof_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: 0.10427
-    #     r1c0: 0.03088
-    #     r2c0: -0.12846
-    # # head_rear_tof_camera
-    # - key:
-    #     first: "/head_rear_tof_camera/image/compressed"
-    #     second: "/imu/data"
-    #   value:
-    #     r0c0: -0.05447
-    #     r1c0: 0.03088
-    #     r2c0: -0.10373
+    # head_right_camera
+    - key:
+        first: "/head_right_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        r0c0: 0.02705
+        r1c0: -0.04412
+        r2c0: -0.01491
+    # head_left_camera
+    - key:
+        first: "/head_left_camera/image/compressed"
+        second: "/imu/data"
+      value:
+        r0c0: 0.02705
+        r1c0: 0.10588
+        r2c0: -0.01491
 
   TO_Sen1ToSen2: []
   RS_READOUT: [] 

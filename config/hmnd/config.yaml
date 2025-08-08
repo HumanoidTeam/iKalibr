@@ -20,50 +20,50 @@ Configor:
       - key: "/head_front_bottom_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 25.0
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/front-bottom-cam-intrinsics.yaml"
+          Weight: 50.0
           TrackLengthMin: 10
           ScaleSplineType: LIN_POS_SPLINE
       
-      # - key: "/head_front_top_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-      #     Weight: 50.0
-      #     TrackLengthMin: 10
-      #     ScaleSplineType: LIN_POS_SPLINE
+      - key: "/head_front_top_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/front-top-cam-intrinsics.yaml"
+          Weight: 50.0
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
       
       - key: "/head_rear_left_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 25.0  
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/rear-left-cam-intrinisics.yaml"
+          Weight: 50.0  
           TrackLengthMin: 10  
           ScaleSplineType: LIN_POS_SPLINE
       
       - key: "/head_rear_right_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics.yaml"
-          Weight: 25.0
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/rear-right-cam-intrinsics.yaml"
+          Weight: 50.0
           TrackLengthMin: 10
           ScaleSplineType: LIN_POS_SPLINE
       
-      # - key: "/head_left_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
-      #     Weight: 50.0
-      #     TrackLengthMin: 10
-      #     ScaleSplineType: LIN_POS_SPLINE
+      - key: "/head_left_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/left-cam-intrinsics.yaml"
+          Weight: 50.0
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
       
-      # - key: "/head_right_camera/image/compressed"
-      #   value:
-      #     Type: "SENSOR_IMAGE_COMP_RS_FIRST"
-      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/cam-intrinsics-fisheye.yaml"
-      #     Weight: 50.0
-      #     TrackLengthMin: 10
-      #     ScaleSplineType: LIN_POS_SPLINE
+      - key: "/head_right_camera/image/compressed"
+        value:
+          Type: "SENSOR_IMAGE_COMP_RS_LAST"
+          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/right-cam-intrinsics.yaml"
+          Weight: 50.0
+          TrackLengthMin: 10
+          ScaleSplineType: LIN_POS_SPLINE
     
     # Reference IMU (main IMU)
     ReferIMU: "/imu/data"
@@ -76,7 +76,7 @@ Configor:
     Duration: 70.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/hmnd-head-on-stick-2/ikalibr_output"
+    OutputPath: "/home/developer/datasets/hmnd-head-on-stick-2/ikalibr_output_intrinisics"
   
   Prior:
     # Gravity magnitude
@@ -87,7 +87,7 @@ Configor:
     
     # Prior spatial-temporal parameters
     SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/hmnd/prior.yaml"
-    
+
     # Optimize temporal parameters (time offsets)
     OptTemporalParams: true
     
@@ -96,7 +96,7 @@ Configor:
     ReadoutTimePadding: 0.01  
     
     # Map downsampling for visualization
-    MapDownSample: 0.03
+    MapDownSample: 0.05
     
     # Increased knot spacing for more stable optimization
     KnotTimeDist:
@@ -104,7 +104,7 @@ Configor:
       ScaleSpline: 0.05    # Increased to match image interval
     
     # Loss function parameters for robust optimization
-    CauchyLossForCameraFactor: 1
+    CauchyLossForCameraFactor: 0.1
 
     NDTLiDAROdometer:
       # 0.5 for indoor case and 1.0 for outdoor case

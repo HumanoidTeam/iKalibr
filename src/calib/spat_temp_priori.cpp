@@ -248,7 +248,7 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
             // if this priori is with respect to the reference IMU, set param constant directly
             *rot1 = Sen1ToSen2;
             if (estimator.HasParameterBlock(rot1->data())) {
-                estimator.SetParameterBlockConstant(rot1->data());
+                // estimator.SetParameterBlockConstant(rot1->data());
             }
         } else if (estimator.HasParameterBlock(rot1->data()) ||
                    estimator.HasParameterBlock(rot2->data())) {
@@ -265,7 +265,7 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
             // if this priori is with respect to the reference IMU, set param constant directly
             *pos1 = Sen1InSen2;
             if (estimator.HasParameterBlock(pos1->data())) {
-                estimator.SetParameterBlockConstant(pos1->data());
+                // estimator.SetParameterBlockConstant(pos1->data());
             }
         } else if (estimator.HasParameterBlock(pos1->data()) ||
                    estimator.HasParameterBlock(pos2->data())) {
@@ -279,7 +279,7 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
             // if this priori is with respect to the reference IMU, set param constant directly
             *to1 = Sen1ToSen2;
             if (estimator.HasParameterBlock(to1)) {
-                estimator.SetParameterBlockConstant(to1);
+                // estimator.SetParameterBlockConstant(to1);
             }
         } else if (estimator.HasParameterBlock(to1) || estimator.HasParameterBlock(to2)) {
             estimator.AddPriorTimeOffsetConstraint(Sen1ToSen2, to1, to2, PrioriWeight);
@@ -290,7 +290,7 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
         double* data = &parMagr.TEMPORAL.RS_READOUT.at(sensor);
         *data = readout;
         if (estimator.HasParameterBlock(data)) {
-            estimator.SetParameterBlockConstant(data);
+            // estimator.SetParameterBlockConstant(data);
         }
     }
     spdlog::info("add spatial and temp priori constraint finished");

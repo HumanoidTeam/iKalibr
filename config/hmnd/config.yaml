@@ -69,14 +69,14 @@ Configor:
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/hmnd-head-on-stick-2/updated.bag"
+    BagPath: "/home/developer/datasets/extrinsics0/updated.bag"
     
     # Adjusted time range for more stable initialization
     BeginTime: 1.0
-    Duration: 70.0
+    Duration: 50.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/hmnd-head-on-stick-2/ikalibr_output_intrinisics"
+    OutputPath: "/home/developer/datasets/extrinsics0/ikalibr_output"
   
   Prior:
     # Gravity magnitude

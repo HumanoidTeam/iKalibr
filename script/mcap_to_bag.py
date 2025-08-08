@@ -366,9 +366,9 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_ra
 
 if __name__ == "__main__":
     # Default paths
-    default_mcap = "/home/developer/datasets/hmnd-head-on-stick-2/eight4_0_vcs_0.mcap"
-    default_bag = "/home/developer/datasets/hmnd-head-on-stick-2/updated.bag"
-    default_csv = "/home/developer/datasets/hmnd-head-on-stick-2/updated.csv"
+    default_mcap = "/home/developer/datasets/extrinsics0/extrinsics0_0.mcap"
+    default_bag = "/home/developer/datasets/extrinsics0/updated.bag"
+    default_csv = "/home/developer/datasets/extrinsics0/updated.csv"
     
     import argparse
     parser = argparse.ArgumentParser(description='Convert MCAP file to ROS bag with rate control')

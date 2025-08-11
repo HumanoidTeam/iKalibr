@@ -368,11 +368,10 @@ void CalibSolver::StoreImagesForSfM(const std::string &topic,
 
     logger->info(
         "command line for 'matches_importer' in colmap for topic '{}':\n"
-        "colmap matches_importer "
+        "colmap sequential_matcher "
         "--database_path {} "
-        "--match_list_path {} "
-        "--match_type pairs\n",
-        topic, database_path, match_list_path);
+        "--SequentialMatching.overlap 7 --SequentialMatching.quadratic_overlap 1\n",
+        topic, database_path);
 
     logger->info(
         "---------------------------------------------------------------------------------");

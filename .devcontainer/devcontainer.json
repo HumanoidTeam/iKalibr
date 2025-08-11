@@ -9,8 +9,7 @@
   "remoteUser": "developer",
   "mounts": [
     "source=${localEnv:HOME}/datasets,target=/home/developer/datasets,type=bind",
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
-    "source=${localEnv:HOME}/.Xauthority,target=/home/developer/.Xauthority,type=bind"
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
   ],
   "runArgs": [
     "--env=DISPLAY",

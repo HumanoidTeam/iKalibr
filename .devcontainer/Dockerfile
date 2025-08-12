@@ -105,17 +105,12 @@ RUN git clone --branch 1.22.10 --single-branch https://github.com/strasdat/Sophu
 #############################################
 # Stage: full (ROS, extras, user, devcontainer setup)
 #############################################
-FROM sophus AS full
+FROM colmap AS full
 
-# Extras used by iKalibr
 WORKDIR /tmp/build
 
-# Sophus (avoid fmt conflict)
-RUN git clone --branch 1.22.10 --single-branch https://github.com/strasdat/Sophus.git && \
-    cd Sophus && mkdir build && cd build && \
-    cmake .. -DSOPHUS_USE_BASIC_LOGGING=ON -DBUILD_TESTING=OFF -DSOPHUS_BUILD_EXAMPLES=OFF -GNinja && \
-    ninja && ninja install && \
-    cd /tmp/build && rm -rf Sophus
+# Bring in Sophus from the sophus stage (avoid rebuilding)
+COPY --from=sophus /usr/local/ /usr/local/
 
 # magic_enum
 RUN git clone --branch v0.9.6 --single-branch https://github.com/Neargye/magic_enum.git && \
@@ -132,7 +127,8 @@ RUN git clone https://github.com/gabime/spdlog.git && \
 # Pangolin v0.8
 RUN git clone --branch v0.8 --single-branch --recursive https://github.com/stevenlovegrove/Pangolin.git && \
     cd Pangolin && mkdir build && cd build && \
-    cmake .. -GNinja && ninja && ninja install && \
+    cmake .. -GNinja -DBUILD_PANGOLIN_PYTHON=OFF -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && \
+    ninja && ninja install && \
     cd /tmp/build && rm -rf Pangolin
 
 # ROS Noetic (Ubuntu 20.04)
@@ -143,6 +139,12 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
     ros-noetic-cv-bridge ros-noetic-velodyne \
     && rm -rf /var/lib/apt/lists/* && \
     echo "source /opt/ros/noetic/setup.bash" >> /etc/bash.bashrc
+
+# Initialize a catkin workspace so /home/iKalibr/devel/setup.bash exists
+RUN bash -lc 'source /opt/ros/noetic/setup.bash && \
+    mkdir -p /home/iKalibr/src && cd /home/iKalibr && \
+    ([ -f src/CMakeLists.txt ] || catkin_init_workspace src) && \
+    catkin_make -j"$(nproc)" -DCMAKE_POLICY_VERSION_MINIMUM=3.5'
 
 # Python extras
 RUN python3 -m pip install --no-cache-dir mcap
@@ -162,10 +164,21 @@ RUN groupadd -g 1000 developer && \
 RUN mkdir -p /home/iKalibr/src/ikalibr /tmp/.X11-unix /home/developer/datasets /root/datasets && \
     chown -R developer:developer /home/developer /home/iKalibr /tmp/.X11-unix
 
+# Global shell env and auto-sourcing for ROS/workspace
+RUN printf '%s\n' \
+    'export DISPLAY=${DISPLAY:-:0}' \
+    'export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp}' \
+    'if [ -f /opt/ros/noetic/setup.bash ]; then source /opt/ros/noetic/setup.bash; fi' \
+    'if [ -f /home/iKalibr/devel/setup.bash ]; then source /home/iKalibr/devel/setup.bash; fi' \
+    > /etc/profile.d/ikalibr.sh && chmod 644 /etc/profile.d/ikalibr.sh && \
+    printf '%s\n' 'if [ -f "$HOME/.bashrc" ]; then . "$HOME/.bashrc"; fi' >> /home/developer/.profile && \
+    chown developer:developer /home/developer/.profile
+
 # Copy optional build helper from repo if present
 COPY build_ikalibr.sh /home/developer/build_ikalibr.sh
 RUN chmod +x /home/developer/build_ikalibr.sh || true && \
-    chown developer:developer /home/developer/build_ikalibr.sh || true
+    chown developer:developer /home/developer/build_ikalibr.sh || true && \
+    sudo ln -sf /home/developer/build_ikalibr.sh /usr/local/bin/ikalibr-build || true
 
 # Switch to developer
 USER developer
@@ -188,16 +201,12 @@ CMD ["/bin/bash"]
 #############################################
 # Stage: full_prebuilt (use prebuilt COLMAP)
 #############################################
-FROM sophus AS full_prebuilt
+FROM colmap AS full_prebuilt
 
-# Extras used by iKalibr
 WORKDIR /tmp/build
 
-# Sophus (avoid fmt conflict)
-RUN git clone --branch 1.22.10 --single-branch https://github.com/strasdat/Sophus.git && \
-    cd Sophus && mkdir build && cd build && \
-    cmake .. -DSOPHUS_USE_BASIC_LOGGING=ON -GNinja && ninja && ninja install && \
-    cd /tmp/build && rm -rf Sophus
+# Bring in Sophus from the sophus stage (avoid rebuilding)
+COPY --from=sophus /usr/local/ /usr/local/
 
 # magic_enum
 RUN git clone --branch v0.9.6 --single-branch https://github.com/Neargye/magic_enum.git && \
@@ -225,6 +234,12 @@ RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main"
     ros-noetic-cv-bridge ros-noetic-velodyne \
     && rm -rf /var/lib/apt/lists/* && \
     echo "source /opt/ros/noetic/setup.bash" >> /etc/bash.bashrc
+
+# Initialize a catkin workspace so /home/iKalibr/devel/setup.bash exists
+RUN bash -lc 'source /opt/ros/noetic/setup.bash && \
+    mkdir -p /home/iKalibr/src && cd /home/iKalibr && \
+    ([ -f src/CMakeLists.txt ] || catkin_init_workspace src) && \
+    catkin_make -j"$(nproc)" -DCMAKE_POLICY_VERSION_MINIMUM=3.5'
 
 # Python extras
 RUN python3 -m pip install --no-cache-dir mcap

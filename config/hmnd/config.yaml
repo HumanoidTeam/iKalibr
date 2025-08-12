@@ -69,14 +69,14 @@ Configor:
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/extrinsics0/updated.bag"
+    BagPath: "/home/developer/datasets/triggered1/updated.bag"
     
     # Adjusted time range for more stable initialization
-    BeginTime: 1.0
-    Duration: 50.0
+    BeginTime: 0.0
+    Duration: 85.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/extrinsics0/ikalibr_output"
+    OutputPath: "/home/developer/datasets/triggered1/ikalibr_output_gpu_test"
   
   Prior:
     # Gravity magnitude
@@ -123,7 +123,7 @@ Configor:
 
   Preference:
     # Use CPU for solving (set to true if you have CUDA)
-    UseCudaInSolving: false
+    UseCudaInSolving: true
     
     # Output options for analysis and visualization
     Outputs:

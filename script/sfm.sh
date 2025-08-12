@@ -12,6 +12,8 @@ fi
 
 SCRIPT_DIR="$1"
 
+cd "$SCRIPT_DIR"
+
 cd head_front_bottom_camera/image/compressed/sfm_ws
 
 colmap feature_extractor --database_path ./database.db --image_path ../images --ImageReader.camera_model PINHOLE --ImageReader.single_camera 1 --ImageReader.camera_params 365.188,365.188,458.291,383.511

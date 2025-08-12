@@ -4,6 +4,9 @@
     "dockerfile": "Dockerfile",
     "context": ".."
   },
+  "hostRequirements": {
+    "gpu": true
+  },
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/iKalibr/src/ikalibr,type=bind",
   "workspaceFolder": "/home/iKalibr",
   "remoteUser": "developer",
@@ -12,6 +15,7 @@
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
   ],
   "runArgs": [
+    "--gpus=all",
     "--env=DISPLAY",
     "--env=XDG_RUNTIME_DIR=/tmp"
   ]

@@ -2,7 +2,11 @@
   "name": "iKalibr Minimal (ROS workspace layout)",
   "build": {
     "dockerfile": "Dockerfile",
-    "context": ".."
+    "context": "..",
+    "target": "full"
+  },
+  "hostRequirements": {
+    "gpu": true
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/iKalibr/src/ikalibr,type=bind",
   "workspaceFolder": "/home/iKalibr",
@@ -12,7 +16,20 @@
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
   ],
   "runArgs": [
+    "--gpus=all",
+    "--runtime=nvidia",
+    "--device=/dev/nvidiactl",
+    "--device=/dev/nvidia0",
+    "--device=/dev/nvidia-uvm",
+    "--device=/dev/nvidia-uvm-tools",
+    "--device-cgroup-rule=c 195:* rmw",
+    "--device-cgroup-rule=c 507:* rmw",
     "--env=DISPLAY",
     "--env=XDG_RUNTIME_DIR=/tmp"
-  ]
+  ],
+  "containerEnv": {
+    "NVIDIA_VISIBLE_DEVICES": "all",
+    "NVIDIA_DRIVER_CAPABILITIES": "compute,utility,graphics"
+  },
+  "postStartCommand": "bash -lc 'source /opt/ros/noetic/setup.bash; mkdir -p /home/iKalibr/src; cd /home/iKalibr; [ -f devel/setup.bash ] || ( [ -f src/CMakeLists.txt ] || catkin_init_workspace src; catkin_make -j$(nproc) )'"
 }

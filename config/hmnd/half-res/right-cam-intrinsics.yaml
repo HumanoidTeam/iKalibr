@@ -1,0 +1,28 @@
+Intrinsics:
+  # polymorphic pointers point to a base class and also point to objects of derived classes
+  # don't care about this field
+  polymorphic_id: 2147483649
+  # the camera model type, supported models are:
+  # (1) pinhole_brown_t2: k1, k2, k3, t1, t2
+  # (2)  pinhole_fisheye: k1, k2, k3, k4
+  polymorphic_name: pinhole_fisheye
+  ptr_wrapper:
+    # don't care about this field
+    id: 2147483649
+    data:
+      img_width: 960
+      img_height: 768
+      # fx, fy
+      focal_length:
+        - 409.3167311194362
+        - 409.3167311194362
+      # cx, cy
+      principal_point:
+        - 495.19705646679074
+        - 378.68920535552746
+      # k1, k2, k3, k4
+      disto_param:
+        - -0.0028360102353018907
+        - -0.0029658267669559766
+        - 0.002569671494139237
+        - -0.000688034566239193

@@ -49,34 +49,34 @@ Configor:
           TrackLengthMin: 10
           ScaleSplineType: LIN_POS_SPLINE
       
-      - key: "/head_left_camera/image/compressed"
-        value:
-          Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/left-cam-intrinsics.yaml"
-          Weight: 50.0
-          TrackLengthMin: 10
-          ScaleSplineType: LIN_POS_SPLINE
+      # - key: "/head_left_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/left-cam-intrinsics.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
       
-      - key: "/head_right_camera/image/compressed"
-        value:
-          Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/right-cam-intrinsics.yaml"
-          Weight: 50.0
-          TrackLengthMin: 10
-          ScaleSplineType: LIN_POS_SPLINE
+      # - key: "/head_right_camera/image/compressed"
+      #   value:
+      #     Type: "SENSOR_IMAGE_COMP_RS_LAST"
+      #     Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/right-cam-intrinsics.yaml"
+      #     Weight: 50.0
+      #     TrackLengthMin: 10
+      #     ScaleSplineType: LIN_POS_SPLINE
     
     # Reference IMU (main IMU)
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/triggered1/updated.bag"
+    BagPath: "/home/developer/datasets/triggered_full_res/updated.bag"
     
     # Adjusted time range for more stable initialization
     BeginTime: 0.0
-    Duration: 85.0
+    Duration: 77.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/triggered1/ikalibr_output_gpu_test"
+    OutputPath: "/home/developer/datasets/triggered_full_res/ikalibr_output"
   
   Prior:
     # Gravity magnitude

@@ -123,7 +123,7 @@ mkdir ${IKALIBR_ROOT_PATH}/thirdparty/opengv-build
 # shellcheck disable=SC2164
 cd "${IKALIBR_ROOT_PATH}"/thirdparty/opengv-build
 
-cmake ../opengv
+cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ../opengv
 echo current path: $PWD
 echo "------------------------"
 echo "start making 'opengv'..."

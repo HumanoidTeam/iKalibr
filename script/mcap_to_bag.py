@@ -10,6 +10,7 @@ from collections import defaultdict
 import numpy as np
 import csv
 import binascii
+import cv2
 
 def ros2_to_ros1(ros2_type):
     return ros2_type.replace('/msg/', '/')
@@ -217,9 +218,10 @@ def fix_jpeg_byte_order(data):
             return bytes(fixed)
     return data
 
-def create_compressed_image_message(data, timestamp, topic):
+def create_compressed_image_message(data, timestamp, topic, resize=False):
     try:
         from sensor_msgs.msg import CompressedImage
+        import cv2
         msg = CompressedImage()
         msg.header.stamp = timestamp
         msg.header.frame_id = topic.split('/')[1]  # e.g., 'head_rear_right_camera'
@@ -241,6 +243,28 @@ def create_compressed_image_message(data, timestamp, topic):
         if len(jpeg_data) < 2 or jpeg_data[:2] != b'\xFF\xD8':
             print(f"[WARN] Invalid JPEG header for {topic}")
             return None
+        
+        # If resize is requested, decode, resize, and re-encode the image
+        if resize:
+            try:
+                # Decode JPEG data to cv2 image
+                img_data = np.frombuffer(jpeg_data, dtype=np.uint8)
+                cv_img = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
+                if cv_img is None:
+                    print(f"[WARN] Failed to decode JPEG for {topic}")
+                    return None
+                
+                # Resize to half resolution
+                cv_img = cv2.resize(cv_img, (0, 0), fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+                
+                # Re-encode to JPEG
+                encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 95]  # High quality
+                _, encoded_img = cv2.imencode('.jpg', cv_img, encode_param)
+                jpeg_data = encoded_img.tobytes()
+                
+            except Exception as e:
+                print(f"[WARN] Failed to resize image for {topic}: {e}")
+                # Continue with original data if resize fails
             
         msg.data = jpeg_data
         return msg
@@ -249,10 +273,12 @@ def create_compressed_image_message(data, timestamp, topic):
         print(f"[ERROR] Failed to create compressed image message for {topic}: {e}")
         return None
 
-def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_rate=1):
+def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_rate=1, resize=False):
     print(f"Converting {mcap_path} to {bag_path}")
     print(f"Image passthrough rate: {image_rate} (1/{image_rate} messages)")
     print(f"IMU passthrough rate: {imu_rate} (1/{imu_rate} messages)")
+    if resize:
+        print(f"Image resize: Enabled (half resolution)")
     if csv_path:
         print(f"Also exporting IMU data to {csv_path}")
     
@@ -326,7 +352,7 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_ra
                 
             # Handle CompressedImage messages
             if 'CompressedImage' in ros1_type:
-                msg = create_compressed_image_message(message.data, timestamp, topic)
+                msg = create_compressed_image_message(message.data, timestamp, topic, args.resize)
             # Handle IMU messages
             elif 'Imu' in ros1_type:
                 msg = create_imu_message_from_raw_data(message.data, timestamp, topic)
@@ -366,9 +392,9 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_ra
 
 if __name__ == "__main__":
     # Default paths
-    default_mcap = "/home/developer/datasets/triggered1/triggered_calib_0.mcap"
-    default_bag = "/home/developer/datasets/triggered1/updated.bag"
-    default_csv = "/home/developer/datasets/triggered1/updated.csv"
+    default_mcap = "/home/developer/datasets/triggered_full_res/triggered_calib_1_0.mcap"
+    default_bag = "/home/developer/datasets/triggered_full_res/updated-half-res.bag"
+    default_csv = "/home/developer/datasets/triggered_full_res/updated-half-res-imu.csv"
     
     import argparse
     parser = argparse.ArgumentParser(description='Convert MCAP file to ROS bag with rate control')
@@ -377,6 +403,7 @@ if __name__ == "__main__":
     parser.add_argument('--csv', default=default_csv, help='Output CSV file path for IMU data')
     parser.add_argument('--image-rate', type=int, default=3, help='Image passthrough rate (1/N messages)')
     parser.add_argument('--imu-rate', type=int, default=1, help='IMU passthrough rate (1/N messages)')
+    parser.add_argument('--resize', action='store_true', default=True, help='Resize images to half resolution')
     
     # Support both positional and named arguments for backward compatibility
     parser.add_argument('mcap_pos', nargs='?', help='Input MCAP file path (positional)')
@@ -410,4 +437,4 @@ if __name__ == "__main__":
         print(f"Error: MCAP file {mcap_path} does not exist")
         sys.exit(1)
     
-    convert_mcap_to_bag(mcap_path, bag_path, csv_path, args.image_rate, args.imu_rate)
+    convert_mcap_to_bag(mcap_path, bag_path, csv_path, args.image_rate, args.imu_rate, args.resize)

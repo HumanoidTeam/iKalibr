@@ -392,9 +392,9 @@ def convert_mcap_to_bag(mcap_path, bag_path, csv_path=None, image_rate=1, imu_ra
 
 if __name__ == "__main__":
     # Default paths
-    default_mcap = "/home/developer/datasets/triggered_full_res/triggered_calib_1_0.mcap"
-    default_bag = "/home/developer/datasets/triggered_full_res/updated-half-res.bag"
-    default_csv = "/home/developer/datasets/triggered_full_res/updated-half-res-imu.csv"
+    default_mcap = "/home/developer/datasets/latest_and_greatest/gstreamer1.mcap"
+    default_bag = "/home/developer/datasets/latest_and_greatest/gstreamer1.bag"
+    default_csv = "/home/developer/datasets/latest_and_greatest/gstreamer1.csv"
     
     import argparse
     parser = argparse.ArgumentParser(description='Convert MCAP file to ROS bag with rate control')
@@ -403,7 +403,7 @@ if __name__ == "__main__":
     parser.add_argument('--csv', default=default_csv, help='Output CSV file path for IMU data')
     parser.add_argument('--image-rate', type=int, default=3, help='Image passthrough rate (1/N messages)')
     parser.add_argument('--imu-rate', type=int, default=1, help='IMU passthrough rate (1/N messages)')
-    parser.add_argument('--resize', action='store_true', default=True, help='Resize images to half resolution')
+    parser.add_argument('--resize', action='store_true', default=False, help='Resize images to half resolution')
     
     # Support both positional and named arguments for backward compatibility
     parser.add_argument('mcap_pos', nargs='?', help='Input MCAP file path (positional)')

@@ -100,7 +100,7 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
             }
 
             // we do not want to try to recover the extrinsic rotation too frequent
-            if ((odometer->GetRotations().size() < 400) ||
+            if ((odometer->GetRotations().size() < 500) ||
                 (odometer->GetRotations().size() % 5 != 0)) {
                 continue;
             }

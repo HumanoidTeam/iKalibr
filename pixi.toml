@@ -1,0 +1,80 @@
+[project]
+name = "ikalibr"
+channels = [
+  "https://prefix.dev/conda-forge",
+  "https://prefix.dev/robostack-noetic"
+]
+platforms = ["linux-64"]
+
+[dependencies]
+python = "*"
+
+# Toolchain
+compilers = "*"
+cmake = ">=3.27"
+make = "*"
+ninja = "*"
+pkg-config = "*"
+git = "*"
+
+# Core C++ deps
+eigen = "3.4.*"
+ceres-solver = "2.2.*"
+suitesparse = "*"
+glog = "*"
+gflags = "*"
+spdlog = "*"
+cereal = "*"
+yaml-cpp = ">=0.8,<0.9"
+magic_enum = ">=0.9.6,<0.10"
+sophus = "*"
+opencv = ">=4.5"
+
+# Graphics / viewers
+pangolin-opengl = ">=0.9,<1"
+libgl-devel = "*"
+
+# SfM tools
+colmap = ">=3.12"
+glomap = ">=1.1"
+
+# # NEW: required by tiny-viewer / ctraj
+pcl = "*"             # provides PCLConfig.cmake
+tbb = "*"             # fixes ufomap link error (-ltbb)
+
+# NEW: make sure the GL loader & CMake config pieces are present
+# opengl = "*"       # metapackage; helps CMake find OpenGL config
+libglvnd = "*"     # GLVND targets (OpenGL::OpenGL etc.)
+glew = "*"         # Pangolin often expects/uses GLEW
+
+# ROS deps unchanged...
+ros-noetic-desktop = "*"
+ros-noetic-catkin = "*"
+catkin_tools = "*"
+ros-noetic-cv-bridge = "*"
+gcc = ">=14.3.0,<14.4"
+gxx = ">=14.3.0,<14.4"
+# ros-noetic-velodyne = "*"
+
+[tasks]
+# Remove all thirdparty build + install dirs
+clean-thirdparty = """
+bash -lc '
+  rm -rf \
+    thirdparty/ctraj/thirdparty/tiny-viewer-build \
+    thirdparty/ctraj/thirdparty/tiny-viewer-install \
+    thirdparty/ctraj-build thirdparty/ctraj-install \
+    thirdparty/ufomap-build thirdparty/ufomap-install \
+    thirdparty/veta-build thirdparty/veta-install \
+    thirdparty/opengv-build thirdparty/opengv-install || true
+  echo "thirdparty builds cleaned."
+'
+"""
+
+# Build thirdparty deps (uses the cleaned environment if run after above)
+thirdparty = "bash -lc './build_thirdparty.sh'"
+
+msgs   = "bash -lc 'catkin_make ikalibr_generate_messages'"
+build  = "bash -lc 'catkin_make -j8 -DUSE_CMAKE_UNITY_BUILD=ON'"
+launch = "bash -lc 'roslaunch ikalibr ikalibr-learn.launch'"
+roscore = "roscore"

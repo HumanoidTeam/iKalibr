@@ -53,11 +53,18 @@ echo "----------------------------------"
 echo "build thirdparty: 'tiny-viewer'..."
 echo "----------------------------------"
 
+mkdir "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
 # shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj
+cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build" || exit
 
-chmod +x build_thirdparty.sh
-./build_thirdparty.sh
+# cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW ../tiny-viewer
+cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../tiny-viewer # -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW
+echo current path: $PWD
+echo "-----------------------------"
+echo "start making 'tiny-viewer'..."
+echo "-----------------------------"
+make -j8
+cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-install"
 
 # build ctraj
 echo "----------------------------"
@@ -68,7 +75,7 @@ mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ctraj-build
 # shellcheck disable=SC2164
 cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj-build
 
-cmake ../ctraj
+cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../ctraj # -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW 
 echo current path: $PWD
 echo "-----------------------"
 echo "start making 'ctraj'..."
@@ -89,7 +96,7 @@ mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ufomap-build
 # shellcheck disable=SC2164
 cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap-build
 
-cmake ../ufomap/ufomap
+cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../ufomap/ufomap
 echo current path: $PWD
 echo "------------------------"
 echo "start making 'ufomap'..."

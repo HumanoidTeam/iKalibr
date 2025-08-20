@@ -53,87 +53,109 @@ echo "----------------------------------"
 echo "build thirdparty: 'tiny-viewer'..."
 echo "----------------------------------"
 
+# Apply patches to fix OpenGL and optional issues without modifying submodule files
+cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer" || exit
+
+if [ -f "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-opengl-fix.patch" ]; then
+    echo "Applying OpenGL fix patch..."
+    # Check if the fix is already applied
+    if ! grep -q "find_package(OpenGL REQUIRED COMPONENTS OpenGL)" src/CMakeLists.txt; then
+        patch -p1 -N -f < "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-opengl-fix.patch" 2>/dev/null || true
+    else
+        echo "OpenGL fix already applied, skipping patch."
+    fi
+fi
+
+if [ -f "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-optional-fix.patch" ]; then
+    echo "Applying optional include fix patch..."
+    # Check if the fix is already applied
+    if ! grep -q "#include <optional>" src/include/tiny-viewer/entity/utils.h; then
+        patch -p1 -N -f < "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-optional-fix.patch" 2>/dev/null || true
+    else
+        echo "Optional include fix already applied, skipping patch."
+    fi
+fi
+
 mkdir "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
 # shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build" || exit
+cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
 
-# cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW ../tiny-viewer
-cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../tiny-viewer # -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW
-echo current path: $PWD
-echo "-----------------------------"
-echo "start making 'tiny-viewer'..."
-echo "-----------------------------"
-make -j8
-cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-install"
+cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW ../tiny-viewer
+# echo current path: $PWD
+# echo "-----------------------------"
+# echo "start making 'tiny-viewer'..."
+# echo "-----------------------------"
+# make -j8
+# cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-install"
 
-# build ctraj
-echo "----------------------------"
-echo "build thirdparty: 'ctraj'..."
-echo "----------------------------"
+# # build ctraj
+# echo "----------------------------"
+# echo "build thirdparty: 'ctraj'..."
+# echo "----------------------------"
 
-mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ctraj-build
-# shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj-build
+# mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ctraj-build
+# # shellcheck disable=SC2164
+# cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj-build
 
-cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../ctraj # -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW 
-echo current path: $PWD
-echo "-----------------------"
-echo "start making 'ctraj'..."
-echo "-----------------------"
-make -j8
-cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj-install"
+# cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../ctraj # -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW 
+# echo current path: $PWD
+# echo "-----------------------"
+# echo "start making 'ctraj'..."
+# echo "-----------------------"
+# make -j8
+# cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj-install"
 
-# build ufomap
-echo "-----------------------------"
-echo "build thirdparty: 'ufomap'..."
-echo "-----------------------------"
+# # build ufomap
+# echo "-----------------------------"
+# echo "build thirdparty: 'ufomap'..."
+# echo "-----------------------------"
 
-# shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap
-git checkout origin/devel_surfel
+# # shellcheck disable=SC2164
+# cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap
+# git checkout origin/devel_surfel
 
-mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ufomap-build
-# shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap-build
+# mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ufomap-build
+# # shellcheck disable=SC2164
+# cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap-build
 
-cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../ufomap/ufomap
-echo current path: $PWD
-echo "------------------------"
-echo "start making 'ufomap'..."
-echo "------------------------"
-make -j8
-cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ufomap-install"
+# cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../ufomap/ufomap
+# echo current path: $PWD
+# echo "------------------------"
+# echo "start making 'ufomap'..."
+# echo "------------------------"
+# make -j8
+# cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ufomap-install"
 
-# build veta
-echo "---------------------------"
-echo "build thirdparty: 'veta'..."
-echo "---------------------------"
+# # build veta
+# echo "---------------------------"
+# echo "build thirdparty: 'veta'..."
+# echo "---------------------------"
 
-mkdir ${IKALIBR_ROOT_PATH}/thirdparty/veta-build
-# shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}"/thirdparty/veta-build
+# mkdir ${IKALIBR_ROOT_PATH}/thirdparty/veta-build
+# # shellcheck disable=SC2164
+# cd "${IKALIBR_ROOT_PATH}"/thirdparty/veta-build
 
-cmake ../veta
-echo current path: $PWD
-echo "----------------------"
-echo "start making 'veta'..."
-echo "----------------------"
-make -j8
-cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/veta-install"
+# cmake ../veta
+# echo current path: $PWD
+# echo "----------------------"
+# echo "start making 'veta'..."
+# echo "----------------------"
+# make -j8
+# cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/veta-install"
 
-# build opengv
-echo "-----------------------------"
-echo "build thirdparty: 'opengv'..."
-echo "-----------------------------"
+# # build opengv
+# echo "-----------------------------"
+# echo "build thirdparty: 'opengv'..."
+# echo "-----------------------------"
 
-mkdir ${IKALIBR_ROOT_PATH}/thirdparty/opengv-build
-# shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}"/thirdparty/opengv-build
+# mkdir ${IKALIBR_ROOT_PATH}/thirdparty/opengv-build
+# # shellcheck disable=SC2164
+# cd "${IKALIBR_ROOT_PATH}"/thirdparty/opengv-build
 
-cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ../opengv
-echo current path: $PWD
-echo "------------------------"
-echo "start making 'opengv'..."
-echo "------------------------"
-make -j8
-cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/opengv-install"
+# cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ../opengv
+# echo current path: $PWD
+# echo "------------------------"
+# echo "start making 'opengv'..."
+# echo "------------------------"
+# make -j8
+# cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/opengv-install"

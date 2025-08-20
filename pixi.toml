@@ -67,9 +67,9 @@ bash -lc '
 """
 
 # Build thirdparty deps (uses the cleaned environment if run after above)
-thirdparty = { cmd = ["bash", "./build_thirdparty.sh"] }
+thirdparty = "bash -lc './build_thirdparty.sh'"
 
-msgs   = { cmd = ["bash", "catkin_make", "ikalibr_generate_messages"] }
-build  = { cmd = ["bash", "catkin_make", "-j8", "-DUSE_CMAKE_UNITY_BUILD=ON"] }
-launch = { cmd = ["bash", "roslaunch", "ikalibr", "ikalibr-learn.launch"] }
-roscore = { cmd = ["bash", "roscore"] }
+msgs   = "bash -lc 'catkin_make ikalibr_generate_messages'"
+build  = "bash -lc 'catkin_make -j8 -DUSE_CMAKE_UNITY_BUILD=ON'"
+launch = "bash -lc 'roslaunch ikalibr ikalibr-learn.launch'"
+roscore = "roscore"

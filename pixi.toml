@@ -72,9 +72,9 @@ thirdparty = "bash -lc 'cd ./iKalibr && ./build_thirdparty.sh'"
 
 msgs = """
 bash -lc '
-  catkin_make \
+  catkin_make -j$(nproc) \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=/home/karim/Documents/Development/calibration/src/iKalibr/patches/opengl_compat.cmake \
+    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=$PIXI_PROJECT_ROOT/src/iKalibr/patches/opengl_compat.cmake \
     -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
     ikalibr_generate_messages
 '
@@ -82,14 +82,22 @@ bash -lc '
 
 build = """
 bash -lc '
-  catkin_make -j8 \
+  catkin_make -j$(nproc) \
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=/home/karim/Documents/Development/calibration/src/iKalibr/patches/combined_compat.cmake \
+    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=$PIXI_PROJECT_ROOT/src/iKalibr/patches/combined_compat.cmake \
     -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
     -Dmagic_enum_DIR=$CONDA_PREFIX/share/cmake/magic_enum \
     -DCMAKE_CXX_FLAGS="-I$CONDA_PREFIX/include" \
     -DUSE_CMAKE_UNITY_BUILD=ON
 '
 """
-launch = "bash -lc 'roslaunch ikalibr ikalibr-learn.launch'"
+launch = """
+bash -c '
+  source devel/setup.bash && \
+  roslaunch $PIXI_PROJECT_ROOT/src/iKalibr/launch/solver/ikalibr-prog.launch \
+    config_path:=$PIXI_PROJECT_ROOT/src/iKalibr/config/ikalibr-dataset-config.yaml
+'
+"""
 roscore = "roscore"
+
+

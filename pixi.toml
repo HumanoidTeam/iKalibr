@@ -16,6 +16,8 @@ make = "*"
 ninja = "*"
 pkg-config = "*"
 git = "*"
+gcc = ">=14.3.0,<14.4"
+gxx = ">=14.3.0,<14.4"
 
 # Core C++ deps
 eigen = "3.4.*"
@@ -42,19 +44,12 @@ glomap = ">=1.1"
 pcl = "*"             # provides PCLConfig.cmake
 tbb = "*"             # fixes ufomap link error (-ltbb)
 
-# NEW: make sure the GL loader & CMake config pieces are present
-# opengl = "*"       # metapackage; helps CMake find OpenGL config
-libglvnd = "*"     # GLVND targets (OpenGL::OpenGL etc.)
-glew = "*"         # Pangolin often expects/uses GLEW
-
 # ROS deps unchanged...
+catkin_tools = "*"
 ros-noetic-desktop = "*"
 ros-noetic-catkin = "*"
-catkin_tools = "*"
 ros-noetic-cv-bridge = "*"
-gcc = ">=14.3.0,<14.4"
-gxx = ">=14.3.0,<14.4"
-# ros-noetic-velodyne = "*"
+ros-noetic-velodyne = "*"
 
 [tasks]
 # Remove all thirdparty build + install dirs

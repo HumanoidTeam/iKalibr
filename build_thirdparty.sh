@@ -53,57 +53,39 @@ echo "----------------------------------"
 echo "build thirdparty: 'tiny-viewer'..."
 echo "----------------------------------"
 
-# Apply patches to fix OpenGL and optional issues without modifying submodule files
-cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer" || exit
+# apply patches
+cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer"
+patch -p1 -N -f < "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-optional-fix.patch" 2>/dev/null || true
 
-if [ -f "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-opengl-fix.patch" ]; then
-    echo "Applying OpenGL fix patch..."
-    # Check if the fix is already applied
-    if ! grep -q "find_package(OpenGL REQUIRED COMPONENTS OpenGL)" src/CMakeLists.txt; then
-        patch -p1 -N -f < "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-opengl-fix.patch" 2>/dev/null || true
-    else
-        echo "OpenGL fix already applied, skipping patch."
-    fi
-fi
-
-if [ -f "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-optional-fix.patch" ]; then
-    echo "Applying optional include fix patch..."
-    # Check if the fix is already applied
-    if ! grep -q "#include <optional>" src/include/tiny-viewer/entity/utils.h; then
-        patch -p1 -N -f < "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-optional-fix.patch" 2>/dev/null || true
-    else
-        echo "Optional include fix already applied, skipping patch."
-    fi
-fi
-
-mkdir "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
+mkdir -p "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
 # shellcheck disable=SC2164
 cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
 
-cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW ../tiny-viewer
-# echo current path: $PWD
-# echo "-----------------------------"
-# echo "start making 'tiny-viewer'..."
-# echo "-----------------------------"
-# make -j8
-# cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-install"
+cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="${IKALIBR_ROOT_PATH}/patches/opengl_compat.cmake" ../tiny-viewer
+echo current path: $PWD
+echo "-----------------------------"
+echo "start making 'tiny-viewer'..."
+echo "-----------------------------"
+make -j"$(nproc)"
+cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-install"
 
-# # build ctraj
-# echo "----------------------------"
-# echo "build thirdparty: 'ctraj'..."
-# echo "----------------------------"
+# build ctraj
+echo "----------------------------"
+echo "build thirdparty: 'ctraj'..."
+echo "----------------------------"
 
-# mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ctraj-build
-# # shellcheck disable=SC2164
-# cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj-build
+mkdir -p ${IKALIBR_ROOT_PATH}/thirdparty/ctraj-build
+# shellcheck disable=SC2164
+cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj-build
 
-# cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" ../ctraj # -DOpenGL_GL_PREFERENCE=LEGACY -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_POLICY_DEFAULT_CMP0167=NEW 
-# echo current path: $PWD
-# echo "-----------------------"
-# echo "start making 'ctraj'..."
-# echo "-----------------------"
-# make -j8
-# cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj-install"
+# cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default;${IKALIBR_ROOT_PATH}/ctraj/thirdparty/tiny-viewer-install" -Dtiny-viewer_DIR="${IKALIBR_ROOT_PATH}/ctraj/thirdparty/tiny-viewer-install/lib/cmake/tiny-viewer" -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="${IKALIBR_ROOT_PATH}/patches/opengl_compat.cmake" ../ctraj
+cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="${IKALIBR_ROOT_PATH}/patches/opengl_compat.cmake" ../ctraj
+echo current path: $PWD
+echo "-----------------------"
+echo "start making 'ctraj'..."
+echo "-----------------------"
+make -j"$(nproc)"
+cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj-install"
 
 # # build ufomap
 # echo "-----------------------------"
@@ -123,7 +105,7 @@ cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DOpenGL_GL_
 # echo "------------------------"
 # echo "start making 'ufomap'..."
 # echo "------------------------"
-# make -j8
+# make -j"$(nproc)"
 # cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ufomap-install"
 
 # # build veta
@@ -140,7 +122,7 @@ cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DOpenGL_GL_
 # echo "----------------------"
 # echo "start making 'veta'..."
 # echo "----------------------"
-# make -j8
+# make -j"$(nproc)"
 # cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/veta-install"
 
 # # build opengv
@@ -157,5 +139,5 @@ cmake -DCMAKE_PREFIX_PATH="${IKALIBR_ROOT_PATH}/.pixi/envs/default" -DOpenGL_GL_
 # echo "------------------------"
 # echo "start making 'opengv'..."
 # echo "------------------------"
-# make -j8
+# make -j"$(nproc)"
 # cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/opengv-install"

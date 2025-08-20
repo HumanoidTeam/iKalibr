@@ -223,6 +223,7 @@ environments:
       - conda: https://prefix.dev/conda-forge/linux-64/libopenvino-tensorflow-lite-frontend-2025.0.0-h5888daf_2.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libopus-1.5.2-hd0c01bc_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libparu-1.0.0-hc6afc67_7100101.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libpcap-1.10.4-hd590300_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libpciaccess-0.18-hb9d3cd8_0.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libpng-1.6.50-h421ea60_1.conda
       - conda: https://prefix.dev/conda-forge/linux-64/libpq-17.6-h3675c94_0.conda
@@ -517,6 +518,11 @@ environments:
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-urdf-1.13.2-np126py311hb22d75c_23.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-urdf-parser-plugin-1.13.2-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-urdf-tutorial-0.5.0-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-1.7.0-np126py311h60bda33_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-driver-1.7.0-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-laserscan-1.7.0-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-msgs-1.7.0-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-pointcloud-1.7.0-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-visualization-marker-tutorials-0.11.0-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-visualization-msgs-1.13.1-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-visualization-tutorials-0.11.0-np126py311h3dde49b_18.conda
@@ -3402,6 +3408,15 @@ packages:
   license_family: GPL
   size: 89738
   timestamp: 1741963824815
+- conda: https://prefix.dev/conda-forge/linux-64/libpcap-1.10.4-hd590300_1.conda
+  sha256: 185227d6cca7666753bdba0d75fe70b832ab899d420087f27323f87c89432aff
+  md5: 831d42d0b3494f267d9e85a95757ab88
+  depends:
+  - libgcc-ng >=12
+  license: BSD-3-Clause
+  license_family: BSD
+  size: 209254
+  timestamp: 1683271798126
 - conda: https://prefix.dev/conda-forge/linux-64/libpciaccess-0.18-hb9d3cd8_0.conda
   sha256: 0bd91de9b447a2991e666f284ae8c722ffb1d84acb594dbd0c031bd656fa32b2
   md5: 70e3400cbbfa03e96dcde7fc13e38c7b
@@ -8841,6 +8856,117 @@ packages:
   license: BSD-3-Clause
   size: 824688
   timestamp: 1736482179780
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-1.7.0-np126py311h60bda33_18.conda
+  sha256: 7062c50411543ee8b964772549d83192210b837b3f7d8bf92e729cde0611967c
+  md5: 1467e27cf8f0fe3572e3f87dfda5f63e
+  depends:
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-velodyne-driver
+  - ros-noetic-velodyne-laserscan
+  - ros-noetic-velodyne-msgs
+  - ros-noetic-velodyne-pointcloud
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=13
+  - libstdcxx >=13
+  - libgcc >=13
+  - numpy >=1.26.4,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  - python_abi 3.11.* *_cp311
+  license: BSD-3-Clause
+  size: 17067
+  timestamp: 1755640971871
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-driver-1.7.0-np126py311h3dde49b_18.conda
+  sha256: 6125aaa9a141870897e9d6225a2913b945a26b9276a0fc86f923d808f0f7d9e7
+  md5: 2d695898db9c5626ffe08ce86812333a
+  depends:
+  - libpcap
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-diagnostic-updater
+  - ros-noetic-dynamic-reconfigure
+  - ros-noetic-nodelet
+  - ros-noetic-roscpp
+  - ros-noetic-tf
+  - ros-noetic-velodyne-msgs
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=14
+  - libgcc >=14
+  - numpy >=1.26.4,<2.0a0
+  - libpcap >=1.10.4,<1.11.0a0
+  - python_abi 3.11.* *_cp311
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  license: BSD-3-Clause
+  size: 222230
+  timestamp: 1736481206964
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-laserscan-1.7.0-np126py311h3dde49b_18.conda
+  sha256: 9c062fcde734ac7b9d5466e81e49f16fa2c24a940666bb78653f269d54d4ac4f
+  md5: 112ac76b66076aecd26c021f56249c34
+  depends:
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-dynamic-reconfigure
+  - ros-noetic-nodelet
+  - ros-noetic-roscpp
+  - ros-noetic-sensor-msgs
+  - libgcc >=14
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - numpy >=1.26.4,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  - python_abi 3.11.* *_cp311
+  license: BSD-3-Clause
+  size: 128479
+  timestamp: 1736480804874
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-msgs-1.7.0-np126py311h3dde49b_18.conda
+  sha256: 3956cddd7e2c5cd52fdf087b54a0df8fccacb9b27e257eea08f861f55db0cbfd
+  md5: b97a31d33b41841969be3bc4671c4fa2
+  depends:
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-message-runtime
+  - ros-noetic-std-msgs
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - numpy >=1.26.4,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  - python_abi 3.11.* *_cp311
+  license: BSD-3-Clause
+  size: 36726
+  timestamp: 1736478505219
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-velodyne-pointcloud-1.7.0-np126py311h3dde49b_18.conda
+  sha256: 05aec770ea66d0299bebde85cdc6402ff18c57342504dc26dbda6106068185f1
+  md5: a7993ae23b13837170d9b6a7124c22ca
+  depends:
+  - eigen
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-angles
+  - ros-noetic-diagnostic-updater
+  - ros-noetic-dynamic-reconfigure
+  - ros-noetic-nodelet
+  - ros-noetic-roscpp
+  - ros-noetic-roslib
+  - ros-noetic-sensor-msgs
+  - ros-noetic-tf2-ros
+  - ros-noetic-velodyne-driver
+  - ros-noetic-velodyne-laserscan
+  - ros-noetic-velodyne-msgs
+  - yaml-cpp
+  - libgcc >=14
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - python_abi 3.11.* *_cp311
+  - yaml-cpp >=0.8.0,<0.9.0a0
+  - numpy >=1.26.4,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  license: BSD-3-Clause
+  size: 326537
+  timestamp: 1736481464790
 - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-visualization-marker-tutorials-0.11.0-np126py311h3dde49b_18.conda
   sha256: bdec85b2a25ad57c48100414d1333cd32e3709a40a953193091f2b861bc5e32a
   md5: 02ade70ea4415cd0ae91aad8b276cadd

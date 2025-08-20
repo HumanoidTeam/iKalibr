@@ -300,7 +300,7 @@ void CalibSolver::AlignStatesToGravity() const {
     }
 }
 
-void CalibSolver::StoreImagesForSfM(const std::string &topic,
+bool CalibSolver::StoreImagesForSfM(const std::string &topic,
                                     const std::set<IndexPair> &matchRes) const {
     // -------------
     // output images
@@ -347,91 +347,78 @@ void CalibSolver::StoreImagesForSfM(const std::string &topic,
 
     auto logger = spdlog::basic_logger_mt("sfm_cmd", *ws + "/sfm-command-line.txt", true);
     // feature extractor
-    logger->info(
-        "command line for 'feature_extractor' in colmap for topic '{}':\n"
-        "colmap feature_extractor "
-        "--database_path {} "
-        "--image_path {} "
-        "--ImageReader.camera_model PINHOLE "
-        "--ImageReader.single_camera 1 "
-        "--ImageReader.camera_params {:.3f},{:.3f},{:.3f},{:.3f}\n",
-        topic, database_path, image_path, intri->FocalX(), intri->FocalY(),
-        intri->PrincipalPoint()(0), intri->PrincipalPoint()(1));
+    // Execute feature extractor
+    std::stringstream ss;
+    ss << "colmap feature_extractor "
+    << "--database_path \"" << database_path << "\" "
+    << "--image_path \"" << image_path << "\" "
+    << "--ImageReader.camera_model PINHOLE "
+    << "--ImageReader.single_camera 1 "
+    << "--ImageReader.camera_params "
+    << std::fixed << std::setprecision(3)
+    << intri->FocalX() << "," << intri->FocalY() << ","
+    << intri->PrincipalPoint()(0) << "," << intri->PrincipalPoint()(1);
 
-    // feature match
-    std::ofstream matchPairFile(match_list_path, std::ios::out);
-    for (const auto &[view1Id, view2Id] : matchRes) {
-        matchPairFile << std::to_string(view1Id) + ".jpg ";
-        matchPairFile << std::to_string(view2Id) + ".jpg" << std::endl;
+    // Execute command and check result
+    logger->info("Executing command for topic '{}':\n{}", topic, ss.str());
+    if (std::system(ss.str().c_str()) != 0) {
+        logger->error("Command failed for topic '{}':\n{}", topic, ss.str());
+        throw ns_ikalibr::Status(Status::CRITICAL,
+                               "Feature extraction failed for topic: '{}'!!!", topic);
     }
-    matchPairFile.close();
 
-    logger->info(
-        "command line for 'matches_importer' in colmap for topic '{}':\n"
-        "colmap sequential_matcher "
-        "--database_path {} "
-        "--SequentialMatching.overlap 7 --SequentialMatching.quadratic_overlap 1\n",
-        topic, database_path);
+    // Execute sequential matcher
+    ss.str("");  // Clear the stringstream
+        ss << "colmap sequential_matcher "
+       << "--database_path \"" << database_path << "\" "
+       << "--SequentialMatching.overlap 13 --SequentialMatching.quadratic_overlap 1";
 
-    logger->info(
-        "---------------------------------------------------------------------------------");
-    logger->info(
-        "- SfM Reconstruction in [COLMAP GUI | COLMAP MAPPER | GLOMAP MAPPER (RECOMMEND)]-");
-    logger->info(
-        "---------------------------------------------------------------------------------");
-    logger->info("- Way 1: COLMAP GUI -");
-    // reconstruction
-    logger->info(
-        "---------------------\n"
-        "colmap gui "
-        "--database_path {} "
-        "--image_path {}",
-        database_path, image_path, output_path);
-    logger->info(
-        "---------------------------------------------------------------------------------");
-    logger->info("- Way 2: COLMAP MAPPER -");
-    double init_max_error = IsRSCamera(topic) ? 2.0 : 1.0;
-    // reconstruction
-    logger->info(
-        "------------------------\n"
-        "colmap mapper "
-        "--database_path {} "
-        "--image_path {} "
-        "--output_path {} "
-        "--Mapper.init_min_tri_angle 25 "
-        "--Mapper.init_max_error {} "
-        "--Mapper.tri_min_angle 3 "
-        "--Mapper.ba_refine_focal_length 0 "
-        "--Mapper.ba_refine_principal_point 0",
-        database_path, image_path, output_path, init_max_error);
-    logger->info(
-        "---------------------------------------------------------------------------------");
-    logger->info("- Way 3: GLOMAP MAPPER (RECOMMEND) -");
-    logger->info(
-        "------------------------------------\n"
-        "glomap mapper "
-        "--database_path {} "
-        "--image_path {} "
-        "--output_path {}",
-        database_path, image_path, output_path);
-    logger->info(
-        "---------------------------------------------------------------------------------\n");
+    // Execute command and check result
+    logger->info("Executing command for topic '{}':\n{}", topic, ss.str());
+    if (std::system(ss.str().c_str()) != 0) {
+        logger->error("Command failed for topic '{}':\n{}", topic, ss.str());
+        throw ns_ikalibr::Status(Status::CRITICAL,
+                               "Sequential matching failed for topic: '{}'!!!", topic);
+    }
 
-    // format convert
-    logger->info(
-        "command line for 'model_converter' in colmap for topic '{}':\n"
-        "colmap model_converter "
-        "--input_path {} "
-        "--output_path {} "
-        "--output_type TXT\n",
-        topic, output_path + "/0", output_path);
+    // Execute glomap mapper (recommended method)
+    ss.str("");  // Clear the stringstream
+        ss << "glomap mapper "
+       << "--database_path \"" << database_path << "\" "
+       << "--image_path \"" << image_path << "\" "
+       << "--output_path \"" << output_path << "\"";
+
+    // Execute command and check result
+    logger->info("Executing command for topic '{}':\n{}", topic, ss.str());
+    if (std::system(ss.str().c_str()) != 0) {
+        logger->error("Command failed for topic '{}':\n{}", topic, ss.str());
+        throw ns_ikalibr::Status(Status::CRITICAL,
+                               "Glomap mapping failed for topic: '{}'!!!", topic);
+    }
+
+    // Execute model converter
+    ss.str("");  // Clear the stringstream
+        ss << "colmap model_converter "
+       << "--input_path \"" << output_path << "/0\" "
+       << "--output_path \"" << output_path << "\" "
+       << "--output_type TXT";
+
+    // Execute command and check result
+    logger->info("Executing command for topic '{}':\n{}", topic, ss.str());
+    if (std::system(ss.str().c_str()) != 0) {
+        logger->error("Command failed for topic '{}':\n{}", topic, ss.str());
+        throw ns_ikalibr::Status(Status::CRITICAL,
+                               "Model conversion failed for topic: '{}'!!!", topic);
+    }
     logger->flush();
     spdlog::drop("sfm_cmd");
 
     std::ofstream file(ns_ikalibr::Configor::DataStream::GetImageStoreInfoFile(topic));
     auto ar = GetOutputArchiveVariant(file, Configor::Preference::OutputDataFormat);
     SerializeByOutputArchiveVariant(ar, Configor::Preference::OutputDataFormat,
-                                    cereal::make_nvp("info", info));
+        cereal::make_nvp("info", info));
+
+    return true;
 }
 
 ns_veta::Veta::Ptr CalibSolver::TryLoadSfMData(const std::string &topic,

@@ -693,7 +693,7 @@ protected:
      * @param camTopic the ros topic of this camera
      * @param matchRes the match results of images of this camera
      */
-    void StoreImagesForSfM(
+    bool StoreImagesForSfM(
         const std::string &camTopic,
         const std::set<std::pair<ns_veta::IndexT, ns_veta::IndexT>> &matchRes) const;
 

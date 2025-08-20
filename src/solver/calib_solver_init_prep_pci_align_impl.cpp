@@ -100,7 +100,7 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
             }
 
             // we do not want to try to recover the extrinsic rotation too frequent
-            if ((odometer->GetRotations().size() < 500) ||
+            if ((odometer->GetRotations().size() < std::min(600, static_cast<int>(frameVec.size()))) ||
                 (odometer->GetRotations().size() % 5 != 0)) {
                 continue;
             }
@@ -266,9 +266,11 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
          * SfM are performed.
          */
         spdlog::info("store images of '{}' for SfM...", topic);
-        StoreImagesForSfM(topic, sfm->FindCovisibility(0.1));
+        bool sfm_run = StoreImagesForSfM(topic, sfm->FindCovisibility(0.1));
 
-        ++needSfMCount;
+        if (!sfm_run) {
+            ++needSfMCount;
+        }
     }
     if (needSfMCount != 0) {
         throw ns_ikalibr::Status(Status::FINE,

@@ -1,0 +1,4 @@
+urdf_parser_py
+numpy>=1.20.0
+PyYAML>=5.1
+transforms3d

@@ -399,6 +399,9 @@ environments:
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-nodelet-core-1.11.1-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-nodelet-topic-tools-1.11.1-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-nodelet-tutorial-math-0.2.0-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pcl-conversions-1.7.4-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pcl-msgs-0.3.0-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pcl-ros-1.7.4-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pluginlib-1.13.0-np126py311hb22d75c_23.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pluginlib-tutorials-0.2.0-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-python-qt-binding-0.4.4-np126py311h5a973d9_18.conda
@@ -504,6 +507,7 @@ environments:
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf-1.13.2-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf-conversions-1.13.2-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf2-0.7.7-np126py311h3dde49b_18.conda
+      - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf2-eigen-0.7.7-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf2-geometry-msgs-0.7.7-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf2-kdl-0.7.7-np126py311h3dde49b_18.conda
       - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf2-msgs-0.7.7-np126py311h3dde49b_18.conda
@@ -6177,6 +6181,103 @@ packages:
   license: BSD-3-Clause
   size: 53711
   timestamp: 1736479420313
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pcl-conversions-1.7.4-np126py311h3dde49b_18.conda
+  sha256: 5a26c2d9c7157704266279724a330ac0a8ea6da5f5dfcf884b83bda780b84a4c
+  md5: 3c4ff7da61faea377b99a96463bfc77f
+  depends:
+  - eigen
+  - libboost-devel
+  - pcl
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-pcl-msgs
+  - ros-noetic-roscpp
+  - ros-noetic-sensor-msgs
+  - ros-noetic-std-msgs
+  - vtk-base
+  - xorg-libx11
+  - xorg-libxext
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - pcl >=1.14.1,<1.14.2.0a0
+  - xorg-libx11 >=1.8.10,<2.0a0
+  - numpy >=1.26.4,<2.0a0
+  - python_abi 3.11.* *_cp311
+  - xorg-libxext >=1.3.6,<2.0a0
+  - vtk-base >=9.3.1,<9.3.2.0a0
+  - libgl >=1.7.0,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  - libboost >=1.86.0,<1.87.0a0
+  - libopengl >=1.7.0,<2.0a0
+  license: BSD-3-Clause
+  size: 47521
+  timestamp: 1736479948537
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pcl-msgs-0.3.0-np126py311h3dde49b_18.conda
+  sha256: 4a43d5091203f1bfa011923bdff1905357dc1f0ec2ce98279f5a2dfbc8509d12
+  md5: 012122132f082050f61a6c31d8678234
+  depends:
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-message-runtime
+  - ros-noetic-sensor-msgs
+  - ros-noetic-std-msgs
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - python_abi 3.11.* *_cp311
+  - numpy >=1.26.4,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  license: BSD-3-Clause
+  size: 53139
+  timestamp: 1736479836428
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pcl-ros-1.7.4-np126py311h3dde49b_18.conda
+  sha256: a3dfeffb171e5a6323f87be1af988048b2054adf2bf074090aa7f7ad372a2649
+  md5: 5235229534d144e1c253441ca9131dbc
+  depends:
+  - eigen
+  - libboost-devel
+  - pcl
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-dynamic-reconfigure
+  - ros-noetic-geometry-msgs
+  - ros-noetic-message-filters
+  - ros-noetic-nodelet
+  - ros-noetic-nodelet-topic-tools
+  - ros-noetic-pcl-conversions
+  - ros-noetic-pcl-msgs
+  - ros-noetic-pluginlib
+  - ros-noetic-rosbag
+  - ros-noetic-roscpp
+  - ros-noetic-sensor-msgs
+  - ros-noetic-std-msgs
+  - ros-noetic-tf
+  - ros-noetic-tf2
+  - ros-noetic-tf2-eigen
+  - ros-noetic-tf2-ros
+  - vtk-base
+  - xorg-libx11
+  - xorg-libxext
+  - libgcc >=14
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - vtk-base >=9.3.1,<9.3.2.0a0
+  - libopengl >=1.7.0,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  - libgl >=1.7.0,<2.0a0
+  - pcl >=1.14.1,<1.14.2.0a0
+  - xorg-libx11 >=1.8.10,<2.0a0
+  - python_abi 3.11.* *_cp311
+  - numpy >=1.26.4,<2.0a0
+  - xorg-libxext >=1.3.6,<2.0a0
+  - libboost >=1.86.0,<1.87.0a0
+  license: BSD-3-Clause
+  size: 1429366
+  timestamp: 1736481184803
 - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-pluginlib-1.13.0-np126py311hb22d75c_23.conda
   sha256: 6027ae104aab62dc2cada4b7e900ff01d5ed3bba06174205d8e25440f12b255f
   md5: 4384fbfa3cca3a1566cfdecd579fd1da
@@ -8541,6 +8642,25 @@ packages:
   license: BSD-3-Clause
   size: 140122
   timestamp: 1736478860359
+- conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf2-eigen-0.7.7-np126py311h3dde49b_18.conda
+  sha256: 234c85248d944786d3c22febcff0e17b4c89211583455db78512db7602f5db42
+  md5: e3ead01fc299d237f2eb5910552f8681
+  depends:
+  - eigen
+  - python
+  - ros-distro-mutex 0.6.* noetic_*
+  - ros-noetic-geometry-msgs
+  - ros-noetic-tf2
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - numpy >=1.26.4,<2.0a0
+  - ros-distro-mutex >=0.6.0,<0.7.0a0
+  - python_abi 3.11.* *_cp311
+  license: BSD-3-Clause
+  size: 25289
+  timestamp: 1736479295210
 - conda: https://prefix.dev/robostack-noetic/linux-64/ros-noetic-tf2-geometry-msgs-0.7.7-np126py311h3dde49b_18.conda
   sha256: d90628ca55d64e8ad69cd790bf21b8ad361cf8898f47cd1e530c5b26e3cfbe88
   md5: 1c70eeea7ceb311586a3588323307674

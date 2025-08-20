@@ -42,7 +42,7 @@
 #include "ctraj/core/spline_bundle.h"
 #include "cereal/types/utility.hpp"
 #include "cereal/types/list.hpp"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 
 namespace {
 bool IKALIBR_UNIQUE_NAME(_2_) = ns_ikalibr::_1_(__FILE__);

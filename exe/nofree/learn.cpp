@@ -39,7 +39,7 @@
 #include "nofree/ufomap_learner.hpp"
 #include "nofree/logo_svg.h"
 #include "nofree/data_collect_demo.h"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "nofree/extract_intri.hpp"
 
 namespace {

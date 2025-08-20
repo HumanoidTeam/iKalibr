@@ -33,7 +33,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include "solver/calib_solver_tpl.hpp"
-#include "magic_enum_flags.hpp"
+#include "magic_enum/magic_enum_flags.hpp"
 #include "util/utils_tpl.hpp"
 
 namespace {

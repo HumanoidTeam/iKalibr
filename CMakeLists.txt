@@ -198,6 +198,8 @@ find_package(magic_enum)
 add_definitions(-DMAGIC_ENUM_RANGE_MIN=0)
 # 1024 = 2^10
 add_definitions(-DMAGIC_ENUM_RANGE_MAX=1023)
+
+find_package(fmt REQUIRED)
 find_package(yaml-cpp)
 find_package(PCL REQUIRED)
 
@@ -439,6 +441,27 @@ target_link_libraries(
 #        ${PROJECT_NAME}_solver REUSE_FROM
 #        ${PROJECT_NAME}_factor
 #)
+
+#############################
+# magic_enum include linkage #
+#############################
+# Ensure magic_enum's include directory is visible to all iKalibr libraries
+if (TARGET magic_enum::magic_enum)
+    set(_IKALIBR_LIB_TARGETS
+            ${PROJECT_NAME}_util
+            ${PROJECT_NAME}_sensor
+            ${PROJECT_NAME}_config
+            ${PROJECT_NAME}_factor
+            ${PROJECT_NAME}_viewer
+            ${PROJECT_NAME}_core
+            ${PROJECT_NAME}_calib
+            ${PROJECT_NAME}_solver)
+    foreach(tgt ${_IKALIBR_LIB_TARGETS})
+        if (TARGET ${tgt})
+            target_link_libraries(${tgt} PUBLIC magic_enum::magic_enum fmt::fmt)
+        endif ()
+    endforeach()
+endif ()
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -567,6 +590,7 @@ target_link_libraries(
 
         # thirdparty
         ${YAML_CPP_LIBRARIES}
+        fmt::fmt
 )
 ###############################
 # libikalibr_lidar_map_viewer #

@@ -41,7 +41,7 @@
 #include "rosbag/bag.h"
 #include "sensor_msgs/Imu.h"
 #include "filesystem"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 
 namespace {
 bool IKALIBR_UNIQUE_NAME(_2_) = ns_ikalibr::_1_(__FILE__);

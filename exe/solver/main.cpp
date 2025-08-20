@@ -38,7 +38,7 @@
 #include "util/status.hpp"
 #include "util/utils_tpl.hpp"
 #include "solver/calib_solver.h"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "solver/calib_solver_io.h"
 #include "calib/calib_param_manager.h"
 #include "calib/calib_data_manager.h"

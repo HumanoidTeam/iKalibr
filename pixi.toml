@@ -50,26 +50,46 @@ ros-noetic-desktop = "*"
 ros-noetic-catkin = "*"
 ros-noetic-cv-bridge = "*"
 ros-noetic-velodyne = "*"
+ros-noetic-pcl-ros = "*"
 
 [tasks]
 # Remove all thirdparty build + install dirs
 clean-thirdparty = """
 bash -lc '
   rm -rf \
-    thirdparty/ctraj/thirdparty/tiny-viewer-build \
-    thirdparty/ctraj/thirdparty/tiny-viewer-install \
-    thirdparty/ctraj-build thirdparty/ctraj-install \
-    thirdparty/ufomap-build thirdparty/ufomap-install \
-    thirdparty/veta-build thirdparty/veta-install \
-    thirdparty/opengv-build thirdparty/opengv-install || true
+    ./iKalibr/thirdparty/ctraj/thirdparty/tiny-viewer-build \
+    ./iKalibr/thirdparty/ctraj/thirdparty/tiny-viewer-install \
+    ./iKalibr/thirdparty/ctraj-build ./iKalibr/thirdparty/ctraj-install \
+    ./iKalibr/thirdparty/ufomap-build ./iKalibr/thirdparty/ufomap-install \
+    ./iKalibr/thirdparty/veta-build ./iKalibr/thirdparty/veta-install \
+    ./iKalibr/thirdparty/opengv-build ./iKalibr/thirdparty/opengv-install || true
   echo "thirdparty builds cleaned."
 '
 """
 
 # Build thirdparty deps (uses the cleaned environment if run after above)
-thirdparty = "bash -lc './build_thirdparty.sh'"
+thirdparty = "bash -lc 'cd ./iKalibr && ./build_thirdparty.sh'"
 
-msgs   = "bash -lc 'catkin_make ikalibr_generate_messages'"
-build  = "bash -lc 'catkin_make -j8 -DUSE_CMAKE_UNITY_BUILD=ON'"
+msgs = """
+bash -lc '
+  catkin_make \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=/home/karim/Documents/Development/calibration/src/iKalibr/patches/opengl_compat.cmake \
+    -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
+    ikalibr_generate_messages
+'
+"""
+
+build = """
+bash -lc '
+  catkin_make -j8 \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=/home/karim/Documents/Development/calibration/src/iKalibr/patches/combined_compat.cmake \
+    -DCMAKE_PREFIX_PATH=$CONDA_PREFIX \
+    -Dmagic_enum_DIR=$CONDA_PREFIX/share/cmake/magic_enum \
+    -DCMAKE_CXX_FLAGS="-I$CONDA_PREFIX/include" \
+    -DUSE_CMAKE_UNITY_BUILD=ON
+'
+"""
 launch = "bash -lc 'roslaunch ikalibr ikalibr-learn.launch'"
 roscore = "roscore"

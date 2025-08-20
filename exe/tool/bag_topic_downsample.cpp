@@ -34,7 +34,7 @@
 
 #include "nofree/bag_merge.h"
 #include "util/cereal_archive_helper.hpp"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "spdlog/spdlog.h"
 #include "util/status.hpp"
 #include "util/utils_tpl.hpp"

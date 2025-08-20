@@ -201,6 +201,7 @@ add_definitions(-DMAGIC_ENUM_RANGE_MAX=1023)
 
 find_package(fmt REQUIRED)
 find_package(yaml-cpp)
+find_package(OpenCV REQUIRED)
 find_package(PCL REQUIRED)
 
 #define PCL_NO_PRECOMPILE [it's very important for Custom pcl Point type]
@@ -458,7 +459,7 @@ if (TARGET magic_enum::magic_enum)
             ${PROJECT_NAME}_solver)
     foreach(tgt ${_IKALIBR_LIB_TARGETS})
         if (TARGET ${tgt})
-            target_link_libraries(${tgt} PUBLIC magic_enum::magic_enum fmt::fmt)
+            target_link_libraries(${tgt} PUBLIC magic_enum::magic_enum fmt::fmt ${OpenCV_LIBS})
         endif ()
     endforeach()
 endif ()

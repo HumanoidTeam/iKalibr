@@ -249,7 +249,7 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
     estimator->PrintParameterInfo();
 
     ceres::Solver::Options strictOptions = _ceresOption;
-    strictOptions.max_num_iterations = 500;
+    strictOptions.max_num_iterations = 200;
     strictOptions.function_tolerance = 1e-12;
     strictOptions.gradient_tolerance = 1e-12;
     strictOptions.parameter_tolerance = 1e-12;

@@ -110,7 +110,8 @@ int main(int argc, char **argv) {
          * this program would continue running here, until the viewer is closed by the users.
          * the viewer is maintained by the 'CalibSolver'.
          */
-
+        ros::shutdown();
+        return 0;
     } catch (const ns_ikalibr::IKalibrStatus &status) {
         // if error happened, print it
         static constexpr auto FStyle = fmt::emphasis::italic | fmt::fg(fmt::color::green);

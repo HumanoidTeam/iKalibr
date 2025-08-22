@@ -3,6 +3,7 @@
 import sys
 import os
 import yaml
+import csv
 import numpy as np
 import transforms3d
 import argparse
@@ -28,6 +29,79 @@ def transform_matrix_to_rpy_xyz(T):
     # Extract position
     xyz = list(T[:3, 3])
     return rpy, xyz
+
+def rotation_angle_degrees(R_rel):
+    """Compute rotation magnitude in degrees from a relative rotation matrix."""
+    # Clamp trace-based value for numerical stability
+    value = (np.trace(R_rel) - 1.0) / 2.0
+    value = float(np.clip(value, -1.0, 1.0))
+    return float(np.degrees(np.arccos(value)))
+
+def get_camera_head_transforms(robot):
+    """Return dict mapping camera child link -> 4x4 head->camera transform."""
+    transforms = {}
+    for joint in robot.joints:
+        if not hasattr(joint, 'child'):
+            continue
+        if 'camera' not in joint.child:
+            continue
+        xyz = joint.origin.xyz if hasattr(joint.origin, 'xyz') else [0, 0, 0]
+        rpy = joint.origin.rpy if hasattr(joint.origin, 'rpy') else [0, 0, 0]
+        transforms[joint.child] = create_transform_matrix(xyz, rpy)
+    return transforms
+
+def write_csv(rows, header, out_path):
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with open(out_path, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+        for row in rows:
+            writer.writerow(row)
+
+def compare_urdfs_and_save(alpha_path, out_path, save_dir):
+    """Compute head-frame and IMU-frame deltas and save as CSVs in save_dir."""
+    alpha_robot = URDF.from_xml_file(alpha_path)
+    new_robot = URDF.from_xml_file(out_path)
+
+    # Head frame comparisons (use joint origins / head->camera)
+    alpha_HC = get_camera_head_transforms(alpha_robot)
+    new_HC = get_camera_head_transforms(new_robot)
+    cameras = sorted(set(alpha_HC.keys()) & set(new_HC.keys()))
+
+    head_rows = []
+    for cam in cameras:
+        T_a = alpha_HC[cam]
+        T_n = new_HC[cam]
+        dxyz = T_n[:3, 3] - T_a[:3, 3]
+        R_rel = np.linalg.inv(T_a[:3, :3]) @ T_n[:3, :3]
+        rot_deg = rotation_angle_degrees(R_rel)
+        head_rows.append([
+            cam,
+            float(dxyz[0]), float(dxyz[1]), float(dxyz[2]),
+            float(np.linalg.norm(dxyz)), float(rot_deg)
+        ])
+
+    # IMU frame comparisons (camera->IMU from URDF)
+    imu_rows = []
+    for cam in cameras:
+        T_a_ci = get_transform_to_imu(alpha_robot, cam)
+        T_n_ci = get_transform_to_imu(new_robot, cam)
+        dxyz = T_n_ci[:3, 3] - T_a_ci[:3, 3]
+        R_rel = np.linalg.inv(T_a_ci[:3, :3]) @ T_n_ci[:3, :3]
+        rot_deg = rotation_angle_degrees(R_rel)
+        imu_rows.append([
+            cam,
+            float(dxyz[0]), float(dxyz[1]), float(dxyz[2]),
+            float(np.linalg.norm(dxyz)), float(rot_deg)
+        ])
+
+    # Save CSVs
+    head_csv = os.path.join(save_dir, 'comparison_head_frame.csv')
+    imu_csv = os.path.join(save_dir, 'comparison_imu_frame.csv')
+    header = ['Camera', 'dX (m)', 'dY (m)', 'dZ (m)', '|dT| (m)', 'Rot. Delta (deg)']
+    write_csv(head_rows, header, head_csv)
+    write_csv(imu_rows, header, imu_csv)
+    return head_csv, imu_csv
 
 def quaternion_to_matrix(q):
     """Convert quaternion to rotation matrix.
@@ -253,16 +327,16 @@ def create_urdf_from_params(param_file, template_urdf_file):
                 print(f"  XYZ: {list(t_cam_imu)}")
                 print(f"  RPY: {list(rpy_cam_imu)}")
                 
-                # Get transform from camera to head_pitch_link
-                # Do the exact reverse of urdf_to_prior.py:
-                # - urdf_to_prior.py: T_cam_imu = inv(T_imu_head) * T_cam_head
-                # - param_to_urdf.py: T_cam_head = T_imu_head * T_cam_imu
-                T_cam_head = np.dot(T_imu_head, T_cam_imu)
-                
-                # Convert to RPY and XYZ
-                rpy, xyz = transform_matrix_to_rpy_xyz(T_cam_head)
-                
-                print(f"Final camera to head_pitch_link transform:")
+                # The calibration provides Camera->IMU (T_IC) transform.
+                # URDF needs Head->Camera (T_HC). From urdf_to_prior:
+                #   T_IC = inv(T_HI) * T_HC  =>  T_HC = T_HI * T_IC
+                # Here, the IMU joint origin gives T_HI (Head->IMU).
+                T_head_cam = np.dot(T_imu_head, T_cam_imu)
+
+                # Convert to RPY and XYZ for URDF storage
+                rpy, xyz = transform_matrix_to_rpy_xyz(T_head_cam)
+
+                print(f"Final head_pitch_link to camera transform:")
                 print(f"  XYZ: {xyz}")
                 print(f"  RPY: {rpy}")
                 
@@ -301,6 +375,10 @@ calibrated camera transforms.
     parser.add_argument('output_file', help='Output URDF file')
     parser.add_argument('--force', '-f', action='store_true',
                        help='Overwrite output file if it exists')
+    parser.add_argument('--compare-with', dest='compare_with', default=None,
+                       help='Optional baseline URDF to compare against (saves CSV reports)')
+    parser.add_argument('--save-comparison-dir', dest='compare_dir', default=None,
+                       help='Directory to save comparison CSVs (defaults to output file directory)')
     args = parser.parse_args()
 
     try:
@@ -374,6 +452,15 @@ calibrated camera transforms.
             sys.exit(1)
             
         print(f"Successfully wrote updated URDF to {args.output_file}")
+
+        # Optional comparison and report saving
+        if args.compare_with:
+            compare_dir = args.compare_dir or (output_dir if output_dir else '.')
+            try:
+                head_csv, imu_csv = compare_urdfs_and_save(args.compare_with, args.output_file, compare_dir)
+                print(f"Saved comparison CSVs to:\n  {head_csv}\n  {imu_csv}")
+            except Exception as e:
+                print(f"Warning: Failed to generate comparison reports: {e}", file=sys.stderr)
         
     except FileNotFoundError as e:
         print(f"Error: {str(e)}", file=sys.stderr)

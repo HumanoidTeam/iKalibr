@@ -4,7 +4,25 @@ import argparse
 import os
 import subprocess
 import sys
+import json
+import yaml
 from pathlib import Path
+
+def detect_file_format(file_path):
+    """Detect if the input file is JSON or YAML based on extension and content."""
+    ext = os.path.splitext(file_path)[1].lower()
+    if ext in ['.json']:
+        return 'json'
+    elif ext in ['.yaml', '.yml']:
+        return 'yaml'
+    
+    # If extension doesn't clearly indicate, try to parse as JSON first
+    try:
+        with open(file_path, 'r') as f:
+            json.load(f)
+            return 'json'
+    except json.JSONDecodeError:
+        return 'yaml'
 
 def run_command(cmd, description):
     """Run a command and check its return status."""
@@ -17,24 +35,34 @@ def run_command(cmd, description):
     print(f"=== {description} completed successfully ===\n")
 
 def main():
-    parser = argparse.ArgumentParser(description='Run complete iKalibr calibration pipeline')
+    parser = argparse.ArgumentParser(
+        description='Run complete iKalibr calibration pipeline',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+    # Using YAML format
+    %(prog)s -i intrinsics/aggregated.yaml -m data.mcap -u robot.urdf -o output/
+
+    # Using JSON format
+    %(prog)s -i intrinsics/aggregated_intrinsics.json -m data.mcap -u robot.urdf -o output/
+""")
     
     # Required arguments
-    parser.add_argument('--input-intrinsics', required=True,
-                      help='Input YAML file containing camera intrinsics')
-    parser.add_argument('--input-mcap', required=True,
+    parser.add_argument('-i', '--input-intrinsics', required=True,
+                      help='Input intrinsics file (either aggregated.yaml or aggregated_intrinsics.json)')
+    parser.add_argument('-m', '--input-mcap', required=True,
                       help='Input MCAP file')
-    parser.add_argument('--input-urdf', required=True,
+    parser.add_argument('-u', '--input-urdf', required=True,
                       help='Input URDF file')
-    parser.add_argument('--output-dir', required=True,
+    parser.add_argument('-o', '--output-dir', required=True,
                       help='Output directory for all generated files')
     
     # Optional arguments
-    parser.add_argument('--image-rate', type=int, default=3,
+    parser.add_argument('-r', '--image-rate', type=int, default=3,
                       help='Image rate for mcap_to_bag conversion (default: 3)')
-    parser.add_argument('--imu-rate', type=int, default=1,
+    parser.add_argument('-s', '--imu-rate', type=int, default=1,
                       help='IMU rate for mcap_to_bag conversion (default: 1)')
-    parser.add_argument('--resize', action='store_true',
+    parser.add_argument('-z', '--resize', action='store_true', default=True,
                       help='Resize images to half resolution in mcap_to_bag conversion')
     
     args = parser.parse_args()
@@ -58,8 +86,18 @@ def main():
     output_urdf = output_dir / 'calibrated.urdf'
     
     # 1. Convert intrinsics
+    input_intrinsics_file = Path(args.input_intrinsics)
+    if not input_intrinsics_file.exists():
+        print(f"Error: Input intrinsics file {input_intrinsics_file} not found")
+        sys.exit(1)
+
+    # Detect file format
+    format_type = detect_file_format(input_intrinsics_file)
+    format_desc = "JSON" if format_type == "json" else "YAML"
+    print(f"\nDetected {format_desc} format for intrinsics file")
+
     run_command(
-        f"python3 /home/iKalibr/src/ikalibr/script/convert_intrinsics.py {args.input_intrinsics} {intrinsics_dir}",
+        f"python3 /home/iKalibr/src/ikalibr/script/convert_intrinsics.py {input_intrinsics_file} {intrinsics_dir}",
         "Intrinsics Conversion"
     )
     

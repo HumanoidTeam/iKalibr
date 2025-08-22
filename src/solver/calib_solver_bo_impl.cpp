@@ -248,7 +248,13 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
 
     estimator->PrintParameterInfo();
 
-    auto sum = estimator->Solve(_ceresOption, this->_priori);
+    ceres::Solver::Options strictOptions = _ceresOption;
+    strictOptions.max_num_iterations = 500;
+    strictOptions.function_tolerance = 1e-12;
+    strictOptions.gradient_tolerance = 1e-12;
+    strictOptions.parameter_tolerance = 1e-12;
+    strictOptions.minimizer_progress_to_stdout = true;
+    auto sum = estimator->Solve(strictOptions, this->_priori);
     spdlog::info("here is the summary:\n{}\n", sum.BriefReport());
 
     // align states to the gravity after the batch optimization is finished

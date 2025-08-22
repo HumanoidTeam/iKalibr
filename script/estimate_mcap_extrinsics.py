@@ -8,6 +8,19 @@ import json
 import yaml
 from pathlib import Path
 
+# Get the script's directory
+SCRIPT_DIR = Path(__file__).resolve().parent
+
+def get_command_prefix():
+    """Determine how to run commands based on environment."""
+    if os.environ.get('PIXI_PROJECT_ROOT'):
+        return 'pixi run python'
+    return 'python3'
+
+def get_script_path(script_name):
+    """Get the path to a script relative to this script's location."""
+    return SCRIPT_DIR / script_name
+
 def detect_file_format(file_path):
     """Detect if the input file is JSON or YAML based on extension and content."""
     ext = os.path.splitext(file_path)[1].lower()
@@ -109,7 +122,7 @@ Examples:
     print(f"\nDetected {format_desc} format for intrinsics file")
 
     run_command(
-        f"python3 /home/iKalibr/src/ikalibr/script/convert_intrinsics.py {input_intrinsics_file} {intrinsics_dir}",
+        f"{get_command_prefix()} {get_script_path('convert_intrinsics.py')} {input_intrinsics_file} {intrinsics_dir}",
         "Intrinsics Conversion"
     )
     
@@ -120,7 +133,7 @@ Examples:
         print(f"Delete the file if you want to regenerate it.")
     else:
         mcap_cmd = [
-            "python3 /home/iKalibr/src/ikalibr/script/mcap_to_bag.py",
+            f"{get_command_prefix()} {get_script_path('mcap_to_bag.py')}",
             f"--mcap {args.input_mcap}",
             f"--bag {bag_file}",
             f"--image-rate {args.image_rate}",
@@ -132,13 +145,13 @@ Examples:
     
     # 3. Generate prior from URDF
     run_command(
-        f"python3 /home/iKalibr/src/ikalibr/script/urdf_to_prior.py {args.input_urdf} {prior_file}",
+        f"{get_command_prefix()} {get_script_path('urdf_to_prior.py')} {args.input_urdf} {prior_file}",
         "URDF to Prior Conversion"
     )
     
     # 4. Generate iKalibr config
     run_command(
-        f"python3 /home/iKalibr/src/ikalibr/script/generate_config.py "
+        f"{get_command_prefix()} {get_script_path('generate_config.py')} "
         f"--intrinsics-folder {intrinsics_dir} "
         f"--prior-yaml {prior_file} "
         f"--output-folder {calib_dir} "
@@ -162,7 +175,7 @@ Examples:
         sys.exit(1)
         
     run_command(
-        f"python3 /home/iKalibr/src/ikalibr/script/param_to_urdf.py "
+        f"{get_command_prefix()} {get_script_path('param_to_urdf.py')} "
         f"{calib_param_file} {args.input_urdf} {output_urdf} --force "
         f"--compare-with {args.input_urdf} --save-comparison-dir {compared_dir}",
         "Parameter to URDF Conversion"

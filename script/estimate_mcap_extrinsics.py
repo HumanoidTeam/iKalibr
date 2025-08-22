@@ -142,6 +142,7 @@ Examples:
         f"--intrinsics-folder {intrinsics_dir} "
         f"--prior-yaml {prior_file} "
         f"--output-folder {calib_dir} "
+        f"--config-output {config_dir} "
         f"--rosbag {bag_file}",
         "Config Generation"
     )

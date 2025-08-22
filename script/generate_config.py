@@ -14,7 +14,9 @@ def parse_args():
     parser.add_argument('--prior-yaml', type=str, required=True,
                       help='Path to prior yaml file')
     parser.add_argument('--output-folder', type=str, required=True,
-                      help='Path to output folder where modified config will be saved')
+                      help='Path to output folder where iKalibr results will be saved')
+    parser.add_argument('--config-output', type=str, required=True,
+                      help='Path to folder where generated config files will be saved')
     parser.add_argument('--rosbag', type=str, required=True,
                       help='Path to input rosbag file')
     parser.add_argument('--template-config', type=str, 
@@ -56,9 +58,10 @@ def get_camera_name(topic):
     camera_name = camera_part.replace('head_', '')
     return camera_name
 
-def update_config(template_path, intrinsics_folder, prior_yaml_path, output_folder, rosbag_path):
-    # Create output folder if it doesn't exist
+def update_config(template_path, intrinsics_folder, prior_yaml_path, output_folder, config_output, rosbag_path):
+    # Create output folders if they don't exist
     os.makedirs(output_folder, exist_ok=True)
+    os.makedirs(config_output, exist_ok=True)
     
     # Read template config
     with open(template_path, 'r') as f:
@@ -93,8 +96,8 @@ def update_config(template_path, intrinsics_folder, prior_yaml_path, output_fold
     ikalibr_output_path = os.path.join(output_folder, 'ikalibr_output')
     config['Configor']['DataStream']['OutputPath'] = ikalibr_output_path
     
-    # Save modified config
-    output_path = os.path.join(output_folder, 'config.yaml')
+    # Save modified config to config_output directory
+    output_path = os.path.join(config_output, 'config.yaml')
     with open(output_path, 'w') as f:
         yaml.dump(config, f, default_flow_style=False)
     
@@ -116,7 +119,7 @@ def main():
         raise FileNotFoundError(f"Rosbag file not found: {args.rosbag}")
     
     update_config(args.template_config, args.intrinsics_folder, args.prior_yaml, 
-                 args.output_folder, args.rosbag)
+                 args.output_folder, args.config_output, args.rosbag)
 
 if __name__ == "__main__":
     main()

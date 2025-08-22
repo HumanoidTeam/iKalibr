@@ -68,22 +68,34 @@ Examples:
     args = parser.parse_args()
     
     # Create output directory structure
-    output_dir = Path(args.output_dir)
+    output_dir = Path(args.output_dir).resolve()  # Get absolute path
     intrinsics_dir = output_dir / 'intrinsics'
     bag_dir = output_dir / 'bag'
     prior_dir = output_dir / 'prior'
     config_dir = output_dir / 'config'
     calib_dir = output_dir / 'calibration'
+    compared_dir = output_dir / 'compared'  # Hardcoded directory for comparison results
     
-    for directory in [output_dir, intrinsics_dir, bag_dir, prior_dir, config_dir, calib_dir]:
+    # Create all required directories
+    directories = [output_dir, intrinsics_dir, bag_dir, prior_dir, config_dir, calib_dir, compared_dir]
+    
+    for directory in directories:
         directory.mkdir(parents=True, exist_ok=True)
+        print(f"Created directory: {directory}")
     
-    # Define output files
+    # Define output files with absolute paths
     bag_file = bag_dir / 'calibration.bag'
     prior_file = prior_dir / 'prior.yaml'
     config_file = config_dir / 'config.yaml'
-    calib_param_file = calib_dir / 'calibration_params.yaml'
+    calib_param_file = calib_dir / 'ikalibr_output/ikalibr_param.yaml'
     output_urdf = output_dir / 'calibrated.urdf'
+    
+    # Convert all paths to absolute paths
+    bag_file = bag_file.resolve()
+    prior_file = prior_file.resolve()
+    config_file = config_file.resolve()
+    calib_param_file = calib_param_file.resolve()
+    output_urdf = output_urdf.resolve()
     
     # 1. Convert intrinsics
     input_intrinsics_file = Path(args.input_intrinsics)
@@ -101,17 +113,22 @@ Examples:
         "Intrinsics Conversion"
     )
     
-    # 2. Convert MCAP to ROS bag
-    mcap_cmd = [
-        "python3 /home/iKalibr/src/ikalibr/script/mcap_to_bag.py",
-        f"--mcap {args.input_mcap}",
-        f"--bag {bag_file}",
-        f"--image-rate {args.image_rate}",
-        f"--imu-rate {args.imu_rate}"
-    ]
-    if args.resize:
-        mcap_cmd.append("--resize")
-    run_command(" ".join(mcap_cmd), "MCAP to ROS Bag Conversion")
+    # 2. Convert MCAP to ROS bag (if needed)
+    if bag_file.exists():
+        print(f"\n=== Skipping MCAP to ROS Bag Conversion ===")
+        print(f"ROS bag file already exists at: {bag_file}")
+        print(f"Delete the file if you want to regenerate it.")
+    else:
+        mcap_cmd = [
+            "python3 /home/iKalibr/src/ikalibr/script/mcap_to_bag.py",
+            f"--mcap {args.input_mcap}",
+            f"--bag {bag_file}",
+            f"--image-rate {args.image_rate}",
+            f"--imu-rate {args.imu_rate}"
+        ]
+        if args.resize:
+            mcap_cmd.append("--resize")
+        run_command(" ".join(mcap_cmd), "MCAP to ROS Bag Conversion")
     
     # 3. Generate prior from URDF
     run_command(
@@ -124,7 +141,8 @@ Examples:
         f"python3 /home/iKalibr/src/ikalibr/script/generate_config.py "
         f"--intrinsics-folder {intrinsics_dir} "
         f"--prior-yaml {prior_file} "
-        f"--output-folder {config_dir} "
+        f"--output-folder {calib_dir} "
+        f"--config-output {config_dir} "
         f"--rosbag {bag_file}",
         "Config Generation"
     )
@@ -137,9 +155,16 @@ Examples:
     )
     
     # 6. Convert calibration parameters back to URDF
+    # First check if calibration params file exists
+    if not calib_param_file.exists():
+        print(f"Error: Calibration parameter file not found at {calib_param_file}")
+        print("This might indicate that the iKalibr calibration step failed.")
+        sys.exit(1)
+        
     run_command(
         f"python3 /home/iKalibr/src/ikalibr/script/param_to_urdf.py "
-        f"{calib_param_file} {args.input_urdf} {output_urdf}",
+        f"{calib_param_file} {args.input_urdf} {output_urdf} --force "
+        f"--compare-with {args.input_urdf} --save-comparison-dir {compared_dir}",
         "Parameter to URDF Conversion"
     )
     

@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
         // pass parameter manager and data manager to solver for solving
         auto solver = ns_ikalibr::CalibSolver::Create(dataMagr, paramMagr);
         // the calibration results are stored in 'paramMagr'
-        // solver->Process();
+        solver->Process();
 
         // solve finished, save calibration results (file type: JSON | YAML | XML | BINARY)
         const auto filename = ns_ikalibr::Configor::DataStream::OutputPath + "/ikalibr_param" +

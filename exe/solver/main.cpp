@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
         // pass parameter manager and data manager to solver for solving
         auto solver = ns_ikalibr::CalibSolver::Create(dataMagr, paramMagr);
         // the calibration results are stored in 'paramMagr'
-        solver->Process();
+        // solver->Process();
 
         // solve finished, save calibration results (file type: JSON | YAML | XML | BINARY)
         const auto filename = ns_ikalibr::Configor::DataStream::OutputPath + "/ikalibr_param" +
@@ -111,27 +111,19 @@ int main(int argc, char **argv) {
          * this program would continue running here, until the viewer is closed by the users.
          * the viewer is maintained by the 'CalibSolver'.
          * 
-         * In headless mode, we need to force shutdown since there's no GUI window to close.
+         * Force cleanup and exit immediately to avoid hanging in any environment.
          */
         
-        // Check if we're in a GUI environment by looking for DISPLAY variable
-        const char* display = std::getenv("DISPLAY");
-        if (display == nullptr || strlen(display) == 0) {
-            // Headless mode: force cleanup and exit immediately
-            spdlog::info("Headless mode detected. Forcing cleanup and exit...");
-            solver.reset();
-            ros::shutdown();
-            return 0;
-        } else {
-            // GUI mode: let the viewer handle shutdown when window is closed
-            spdlog::info("GUI mode detected. Viewer will remain open until closed by user.");
-            spdlog::info("Press Ctrl+C to exit if the viewer doesn't close automatically.");
-            // Give user time to see the message
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+        spdlog::info("Processing complete. Forcing cleanup and exit...");
         
+        // Force cleanup of the solver to ensure viewer threads are properly terminated
+        solver.reset();
+        
+        // Force ROS shutdown
         ros::shutdown();
-        return 0;
+        
+        // Force exit to ensure all threads are terminated
+        std::exit(0);
     } catch (const ns_ikalibr::IKalibrStatus &status) {
         // if error happened, print it
         static constexpr auto FStyle = fmt::emphasis::italic | fmt::fg(fmt::color::green);

@@ -124,7 +124,7 @@ Configor:
 
   Preference:
     # Use CPU for solving (set to true if you have CUDA)
-    UseCudaInSolving: false
+    UseCudaInSolving: true
     
     # Output options for analysis and visualization
     Outputs:

@@ -111,18 +111,24 @@ int main(int argc, char **argv) {
          * this program would continue running here, until the viewer is closed by the users.
          * the viewer is maintained by the 'CalibSolver'.
          * 
-         * Force cleanup and exit immediately to avoid hanging in any environment.
+         * In headless mode, the viewer thread gets stuck in pangolin::ShouldQuit() loop.
+         * We need to force exit after cleanup to avoid hanging.
          */
         
-        spdlog::info("Processing complete. Forcing cleanup and exit...");
+        spdlog::info("Processing complete. Cleaning up...");
         
         // Force cleanup of the solver to ensure viewer threads are properly terminated
+        // This will call the destructor which should join the viewer thread
         solver.reset();
         
         // Force ROS shutdown
         ros::shutdown();
         
-        // Force exit to ensure all threads are terminated
+        // Give a small delay to allow threads to clean up properly
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        
+        // Force exit to prevent hanging from stuck viewer thread
+        // The viewer thread is stuck in pangolin::ShouldQuit() loop in headless mode
         std::exit(0);
     } catch (const ns_ikalibr::IKalibrStatus &status) {
         // if error happened, print it

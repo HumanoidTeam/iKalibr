@@ -44,6 +44,7 @@
 #include "calib/calib_data_manager.h"
 #include "filesystem"
 #include <cstdlib>
+#include <csignal>
 
 namespace {
 bool IKALIBR_UNIQUE_NAME(_2_) = ns_ikalibr::_1_(__FILE__);
@@ -115,7 +116,14 @@ int main(int argc, char **argv) {
          */
         
         spdlog::info("Processing complete. Exiting...");
-        
+
+        // Unconditionally terminate to avoid GUI/viewer hang. Send SIGINT then exit process.
+        spdlog::warn("Forcing termination: raising SIGINT and exiting now.");
+        std::raise(SIGINT);
+        // Ensure logs are flushed before exiting
+        spdlog::shutdown();
+        // Exit without unwinding stack to avoid blocking in destructors (e.g., viewer thread)
+        std::quick_exit(0);
         // Force ROS shutdown first
         ros::shutdown();
         

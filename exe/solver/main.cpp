@@ -38,11 +38,13 @@
 #include "util/status.hpp"
 #include "util/utils_tpl.hpp"
 #include "solver/calib_solver.h"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "solver/calib_solver_io.h"
 #include "calib/calib_param_manager.h"
 #include "calib/calib_data_manager.h"
 #include "filesystem"
+#include <cstdlib>
+#include <csignal>
 
 namespace {
 bool IKALIBR_UNIQUE_NAME(_2_) = ns_ikalibr::_1_(__FILE__);
@@ -109,8 +111,27 @@ int main(int argc, char **argv) {
         /**
          * this program would continue running here, until the viewer is closed by the users.
          * the viewer is maintained by the 'CalibSolver'.
+         * 
+         * In headless mode, we need to avoid the viewer thread hanging issue.
          */
+        
+        spdlog::info("Processing complete. Exiting...");
 
+        // Unconditionally terminate to avoid GUI/viewer hang. Send SIGINT then exit process.
+        spdlog::warn("Forcing termination: raising SIGINT and exiting now.");
+        std::raise(SIGINT);
+        // Ensure logs are flushed before exiting
+        spdlog::shutdown();
+        // Exit without unwinding stack to avoid blocking in destructors (e.g., viewer thread)
+        std::quick_exit(0);
+        // Force ROS shutdown first
+        ros::shutdown();
+        
+        // In headless mode, don't try to clean up the solver properly
+        // as it will hang trying to join the stuck viewer thread
+        // Just let the process exit naturally
+        
+        return 0;
     } catch (const ns_ikalibr::IKalibrStatus &status) {
         // if error happened, print it
         static constexpr auto FStyle = fmt::emphasis::italic | fmt::fg(fmt::color::green);

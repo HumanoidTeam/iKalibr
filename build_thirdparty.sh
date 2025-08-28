@@ -53,27 +53,39 @@ echo "----------------------------------"
 echo "build thirdparty: 'tiny-viewer'..."
 echo "----------------------------------"
 
-# shellcheck disable=SC2164
-cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj
+# apply patches
+cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer"
+patch -p1 -N -f < "${IKALIBR_ROOT_PATH}/patches/tiny-viewer-optional-fix.patch" 2>/dev/null || true
 
-chmod +x build_thirdparty.sh
-./build_thirdparty.sh
+mkdir -p "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
+# shellcheck disable=SC2164
+cd "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-build"
+
+cmake -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="${IKALIBR_ROOT_PATH}/patches/opengl_compat.cmake" \
+      ../tiny-viewer
+echo current path: $PWD
+echo "-----------------------------"
+echo "start making 'tiny-viewer'..."
+echo "-----------------------------"
+make -j"$(nproc)"
+cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj/thirdparty/tiny-viewer-install"
 
 # build ctraj
 echo "----------------------------"
 echo "build thirdparty: 'ctraj'..."
 echo "----------------------------"
 
-mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ctraj-build
+mkdir -p ${IKALIBR_ROOT_PATH}/thirdparty/ctraj-build
 # shellcheck disable=SC2164
 cd "${IKALIBR_ROOT_PATH}"/thirdparty/ctraj-build
 
-cmake ../ctraj
+cmake -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="${IKALIBR_ROOT_PATH}/patches/opengl_compat.cmake" \
+      ../ctraj
 echo current path: $PWD
 echo "-----------------------"
 echo "start making 'ctraj'..."
 echo "-----------------------"
-make -j8
+make -j"$(nproc)"
 cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ctraj-install"
 
 # build ufomap
@@ -85,16 +97,17 @@ echo "-----------------------------"
 cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap
 git checkout origin/devel_surfel
 
-mkdir ${IKALIBR_ROOT_PATH}/thirdparty/ufomap-build
+mkdir -p ${IKALIBR_ROOT_PATH}/thirdparty/ufomap-build
 # shellcheck disable=SC2164
 cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap-build
 
-cmake ../ufomap/ufomap
+cmake -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES="${IKALIBR_ROOT_PATH}/patches/tbb_compat.cmake" \
+      ../ufomap/ufomap
 echo current path: $PWD
 echo "------------------------"
 echo "start making 'ufomap'..."
 echo "------------------------"
-make -j8
+make -j"$(nproc)"
 cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/ufomap-install"
 
 # build veta
@@ -111,7 +124,7 @@ echo current path: $PWD
 echo "----------------------"
 echo "start making 'veta'..."
 echo "----------------------"
-make -j8
+make -j"$(nproc)"
 cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/veta-install"
 
 # build opengv
@@ -128,5 +141,5 @@ echo current path: $PWD
 echo "------------------------"
 echo "start making 'opengv'..."
 echo "------------------------"
-make -j8
+make -j"$(nproc)"
 cmake --install . --prefix "${IKALIBR_ROOT_PATH}/thirdparty/opengv-install"

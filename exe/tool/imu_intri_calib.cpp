@@ -35,7 +35,7 @@
 #include "ros/ros.h"
 #include "spdlog/spdlog.h"
 #include "util/status.hpp"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "nofree/imu_intri_calib.h"
 #include "util/utils_tpl.hpp"
 

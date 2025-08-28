@@ -40,7 +40,7 @@
 #include "ufo/map/predicate/predicates.h"
 #include "tiny-viewer/core/multi_viewer.h"
 #include "util/cloud_define.hpp"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "util/utils_tpl.hpp"
 #include "tiny-viewer/object/aligned_cloud.hpp"
 #include "tiny-viewer/core/pose.hpp"

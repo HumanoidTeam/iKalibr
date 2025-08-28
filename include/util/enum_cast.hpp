@@ -36,7 +36,7 @@
 #define IKALIBR_ENUM_CAST_HPP
 
 #include "exception"
-#include "magic_enum.hpp"
+#include "magic_enum/magic_enum.hpp"
 #include "string"
 #include "util/utils.h"
 

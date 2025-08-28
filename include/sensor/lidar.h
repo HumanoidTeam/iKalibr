@@ -58,12 +58,12 @@ private:
 public:
     // constructor
     explicit LiDARFrame(double timestamp = INVALID_TIME_STAMP,
-                        IKalibrPointCloud::Ptr scan = boost::make_shared<IKalibrPointCloud>());
+                        IKalibrPointCloud::Ptr scan = std::make_shared<IKalibrPointCloud>());
 
     // creator
     static LiDARFrame::Ptr Create(
         double timestamp = INVALID_TIME_STAMP,
-        const IKalibrPointCloud::Ptr &scan = boost::make_shared<IKalibrPointCloud>());
+        const IKalibrPointCloud::Ptr &scan = std::make_shared<IKalibrPointCloud>());
 
     // access
     [[nodiscard]] IKalibrPointCloud::Ptr GetScan() const;

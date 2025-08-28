@@ -35,7 +35,7 @@
 #include "config/configor.h"
 #include "spdlog/spdlog.h"
 #include "util/status.hpp"
-#include "magic_enum_flags.hpp"
+#include "magic_enum/magic_enum_flags.hpp"
 #include "ros/package.h"
 #include "filesystem"
 #include "cereal/types/vector.hpp"

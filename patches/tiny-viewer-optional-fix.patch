@@ -1,0 +1,9 @@
+--- a/src/include/tiny-viewer/entity/utils.h
++++ b/src/include/tiny-viewer/entity/utils.h
+@@ -47,6 +47,7 @@
+ #include "cereal/archives/binary.hpp"
+ #include "cereal/types/polymorphic.hpp"
+ #include "fstream"
++#include <optional>
+ #include "pangolin/gl/colour.h"
+ #include "pangolin/gl/opengl_render_state.h"

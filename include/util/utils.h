@@ -51,7 +51,7 @@ the downside is that the specialization must be defined before using code snippe
 std::vector<Vector2d.
  */
 #include "veta/type_def.hpp"
-#include "magic_enum.hpp"
+#include "magic_enum/magic_enum.hpp"
 #include "ros/ros.h"
 #include "ctraj/utils/sophus_utils.hpp"
 #include "spdlog/fmt/fmt.h"

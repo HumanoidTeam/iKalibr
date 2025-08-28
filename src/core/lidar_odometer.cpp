@@ -70,7 +70,7 @@ ns_ctraj::Posed LiDAROdometer::FeedFrame(const LiDARFrame::Ptr &frame,
         curLtoM = ns_ctraj::Posed(frame->GetTimestamp());
 
         // create map
-        _map = boost::make_shared<IKalibrPointCloud>();
+        _map = std::make_shared<IKalibrPointCloud>();
         _mapTime = frame->GetTimestamp();
 
         // here the pose id identity

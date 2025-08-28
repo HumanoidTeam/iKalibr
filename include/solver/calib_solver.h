@@ -59,11 +59,11 @@ using PinholeIntrinsicPtr = std::shared_ptr<PinholeIntrinsic>;
 
 namespace pcl {
 struct PointXYZRGBA;
-using ColorPointCloudPtr = boost::shared_ptr<pcl::PointCloud<PointXYZRGBA>>;
+using ColorPointCloudPtr = std::shared_ptr<pcl::PointCloud<PointXYZRGBA>>;
 }  // namespace pcl
 
 struct PointXYZT;
-using IKalibrPointCloudPtr = boost::shared_ptr<pcl::PointCloud<PointXYZT>>;
+using IKalibrPointCloudPtr = std::shared_ptr<pcl::PointCloud<PointXYZT>>;
 
 namespace ns_ikalibr {
 struct CalibParamManager;

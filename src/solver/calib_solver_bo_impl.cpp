@@ -249,11 +249,15 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
     estimator->PrintParameterInfo();
 
     ceres::Solver::Options strictOptions = _ceresOption;
-    strictOptions.max_num_iterations = 200;
-    strictOptions.function_tolerance = 1e-12;
-    strictOptions.gradient_tolerance = 1e-12;
-    strictOptions.parameter_tolerance = 1e-12;
-    strictOptions.minimizer_progress_to_stdout = true;
+    strictOptions.max_num_iterations = 100;
+    strictOptions.function_tolerance = 1e-4;
+    strictOptions.gradient_tolerance = 1e-8;
+    strictOptions.parameter_tolerance = 1e-6;
+    strictOptions.use_nonmonotonic_steps = true;
+    strictOptions.use_inner_iterations = true;
+    strictOptions.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
+    strictOptions.sparse_linear_algebra_library_type = ceres::SUITE_SPARSE;
+    strictOptions.linear_solver_type = ceres::SPARSE_SCHUR;
     auto sum = estimator->Solve(strictOptions, this->_priori);
     spdlog::info("here is the summary:\n{}\n", sum.BriefReport());
 

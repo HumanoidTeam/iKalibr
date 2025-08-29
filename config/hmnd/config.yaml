@@ -9,7 +9,7 @@ Configor:
         value:
           Type: "SENSOR_IMU"
           # Using default IMU intrinsics (identity matrix)
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/imu-intrinsics.yaml"
+          Intrinsics: "imu-intrinsics.yaml"
           # Weights based on typical IMU noise levels
           # Adjust these based on your specific IMU characteristics
           AcceWeight: 17.68
@@ -20,7 +20,7 @@ Configor:
       - key: "/head_front_bottom_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/front-bottom-cam-intrinsics.yaml"
+          Intrinsics: "front-bottom-cam-intrinsics.yaml"
           Weight: 50.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
@@ -28,7 +28,7 @@ Configor:
       - key: "/head_front_top_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/front-top-cam-intrinsics.yaml"
+          Intrinsics: "front-top-cam-intrinsics.yaml"
           Weight: 50.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
@@ -36,7 +36,7 @@ Configor:
       - key: "/head_rear_left_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/rear-left-cam-intrinisics.yaml"
+          Intrinsics: "rear-left-cam-intrinisics.yaml"
           Weight: 50.0  
           TrackLengthMin: 40  
           ScaleSplineType: LIN_POS_SPLINE
@@ -44,7 +44,7 @@ Configor:
       - key: "/head_rear_right_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/rear-right-cam-intrinsics.yaml"
+          Intrinsics: "rear-right-cam-intrinsics.yaml"
           Weight: 50.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
@@ -52,7 +52,7 @@ Configor:
       - key: "/head_left_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/left-cam-intrinsics.yaml"
+          Intrinsics: "left-cam-intrinsics.yaml"
           Weight: 50.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
@@ -60,7 +60,7 @@ Configor:
       - key: "/head_right_camera/image/compressed"
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
-          Intrinsics: "/home/iKalibr/src/ikalibr/config/hmnd/right-cam-intrinsics.yaml"
+          Intrinsics: "right-cam-intrinsics.yaml"
           Weight: 50.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
@@ -69,14 +69,14 @@ Configor:
     ReferIMU: "/imu/data"
     
     # Path to your converted bag file (cleaned version)
-    BagPath: "/home/developer/datasets/latest_and_greatest/gstreamer1.bag"
+    BagPath: "input.bag"
     
     # Adjusted time range for more stable initialization
     BeginTime: 0.0
     Duration: 81.0
     
     # Output directory for results
-    OutputPath: "/home/developer/datasets/latest_and_greatest/testing-end-to-end-pipeline"
+    OutputPath: "output"
   
   Prior:
     # Gravity magnitude
@@ -86,8 +86,7 @@ Configor:
     GravityDirectionZ: -1
     
     # Prior spatial-temporal parameters
-    SpatTempPrioriPath: "/home/iKalibr/src/ikalibr/config/hmnd/prior.yaml"
-    # SpatTempPrioriPath: ""
+    SpatTempPrioriPath: "prior.yaml"
 
     # Optimize temporal parameters (time offsets)
     OptTemporalParams: true
@@ -105,7 +104,7 @@ Configor:
       ScaleSpline: 0.05    # Increased to match image interval
     
     # Loss function parameters for robust optimization
-    CauchyLossForCameraFactor: 0.1
+    CauchyLossForCameraFactor: 0.075
 
     NDTLiDAROdometer:
       # 0.5 for indoor case and 1.0 for outdoor case

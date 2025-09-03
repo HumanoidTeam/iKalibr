@@ -52,7 +52,7 @@ class SpatialTemporalPriori {
 public:
     using Ptr = std::shared_ptr<SpatialTemporalPriori>;
     using FromTo = std::pair<std::string, std::string>;
-    constexpr static double PrioriWeight = 1E4;
+    constexpr static double PrioriWeight = 1E5;
 
 public:
     // extrinsics

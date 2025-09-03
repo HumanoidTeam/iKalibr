@@ -249,10 +249,19 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
     estimator->PrintParameterInfo();
 
     ceres::Solver::Options strictOptions = _ceresOption;
-    strictOptions.max_num_iterations = 150;
-    strictOptions.function_tolerance = 1e-10;
-    strictOptions.gradient_tolerance = 1e-10;
-    strictOptions.parameter_tolerance = 1e-10;
+    // Prefer LM for robustness on large, mixed-unit problems
+    strictOptions.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
+    // Allow more iterations and use practical tolerances
+    strictOptions.max_num_iterations = 600;
+    strictOptions.function_tolerance = 1e-7;
+    strictOptions.gradient_tolerance = 1e-7;
+    strictOptions.parameter_tolerance = 1e-9;
+    // Enable inner iterations to help temporal/readout parameters settle
+    strictOptions.use_inner_iterations = true;
+    // Prefer sparse Schur on CPU
+    if (!Configor::Preference::UseCudaInSolving) {
+        strictOptions.linear_solver_type = ceres::SPARSE_SCHUR;
+    }
     strictOptions.minimizer_progress_to_stdout = true;
     auto sum = estimator->Solve(strictOptions, this->_priori);
     spdlog::info("here is the summary:\n{}\n", sum.BriefReport());

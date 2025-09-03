@@ -21,7 +21,7 @@ Configor:
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
           Intrinsics: "front-bottom-cam-intrinsics.yaml"
-          Weight: 50.0
+          Weight: 25.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
       
@@ -29,7 +29,7 @@ Configor:
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
           Intrinsics: "front-top-cam-intrinsics.yaml"
-          Weight: 50.0
+          Weight: 25.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
       
@@ -37,7 +37,7 @@ Configor:
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
           Intrinsics: "rear-left-cam-intrinisics.yaml"
-          Weight: 50.0  
+          Weight: 25.0  
           TrackLengthMin: 40  
           ScaleSplineType: LIN_POS_SPLINE
       
@@ -45,7 +45,7 @@ Configor:
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
           Intrinsics: "rear-right-cam-intrinsics.yaml"
-          Weight: 50.0
+          Weight: 25.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
       
@@ -53,7 +53,7 @@ Configor:
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
           Intrinsics: "left-cam-intrinsics.yaml"
-          Weight: 50.0
+          Weight: 25.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
       
@@ -61,7 +61,7 @@ Configor:
         value:
           Type: "SENSOR_IMAGE_COMP_RS_LAST"
           Intrinsics: "right-cam-intrinsics.yaml"
-          Weight: 50.0
+          Weight: 25.0
           TrackLengthMin: 40
           ScaleSplineType: LIN_POS_SPLINE
     
@@ -92,16 +92,16 @@ Configor:
     OptTemporalParams: true
     
     # Increased padding for more stable optimization
-    TimeOffsetPadding: 0.15  
-    ReadoutTimePadding: 0.01  
+    TimeOffsetPadding: 0.05  
+    ReadoutTimePadding: 0.005  
     
     # Map downsampling for visualization
     MapDownSample: 0.03
     
     # Increased knot spacing for more stable optimization
     KnotTimeDist:
-      SO3Spline: 0.05      # Increased to match image interval
-      ScaleSpline: 0.05    # Increased to match image interval
+      SO3Spline: 0.08      # Increased to reduce overfitting
+      ScaleSpline: 0.08    # Increased to reduce overfitting
     
     # Loss function parameters for robust optimization
     CauchyLossForCameraFactor: 0.075
@@ -129,9 +129,8 @@ Configor:
     Outputs:
       - ParamInEachIter
       - VisualMaps
-      # - VisualKinematics
-      # - AlignedInertialMes
-      # - VisualReprojErrors
+      - AlignedInertialMes
+      - VisualReprojErrors
     
     # Output format
     OutputDataFormat: "YAML"

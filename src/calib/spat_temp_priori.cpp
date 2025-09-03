@@ -245,15 +245,11 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
         const auto& [sen1, sen2] = sensorPair;
         Sophus::SO3d *rot1 = SO3Address.at(sen1), *rot2 = SO3Address.at(sen2);
         if (sen2 == RefIMU) {
-            // if this priori is with respect to the reference IMU, set param constant directly
+            // Initialize to prior and add constraint to keep it close during optimization
             *rot1 = Sen1ToSen2;
-            if (estimator.HasParameterBlock(rot1->data())) {
-                // estimator.SetParameterBlockConstant(rot1->data());
-            }
+            estimator.AddPriorExtriSO3Constraint(Sen1ToSen2, rot1, rot2, PrioriWeight);
         } else if (estimator.HasParameterBlock(rot1->data()) ||
                    estimator.HasParameterBlock(rot2->data())) {
-            // only one of the param block has been added to problem, we then add the constraint,
-            // to make sure a unique least-squares solution
             estimator.AddPriorExtriSO3Constraint(Sen1ToSen2, rot1, rot2, PrioriWeight);
         }
     }
@@ -262,11 +258,8 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
         Eigen::Vector3d *pos1 = POSAddress.at(sen1), *pos2 = POSAddress.at(sen2);
         Sophus::SO3d* rot2 = SO3Address.at(sen2);
         if (sen2 == RefIMU) {
-            // if this priori is with respect to the reference IMU, set param constant directly
             *pos1 = Sen1InSen2;
-            if (estimator.HasParameterBlock(pos1->data())) {
-                // estimator.SetParameterBlockConstant(pos1->data());
-            }
+            estimator.AddPriorExtriPOSConstraint(Sen1InSen2, pos1, rot2, pos2, PrioriWeight);
         } else if (estimator.HasParameterBlock(pos1->data()) ||
                    estimator.HasParameterBlock(pos2->data())) {
             estimator.AddPriorExtriPOSConstraint(Sen1InSen2, pos1, rot2, pos2, PrioriWeight);
@@ -276,11 +269,8 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
         const auto& [sen1, sen2] = sensorPair;
         double *to1 = TOAddress.at(sen1), *to2 = TOAddress.at(sen2);
         if (sen2 == RefIMU) {
-            // if this priori is with respect to the reference IMU, set param constant directly
             *to1 = Sen1ToSen2;
-            if (estimator.HasParameterBlock(to1)) {
-                // estimator.SetParameterBlockConstant(to1);
-            }
+            estimator.AddPriorTimeOffsetConstraint(Sen1ToSen2, to1, to2, PrioriWeight);
         } else if (estimator.HasParameterBlock(to1) || estimator.HasParameterBlock(to2)) {
             estimator.AddPriorTimeOffsetConstraint(Sen1ToSen2, to1, to2, PrioriWeight);
         }

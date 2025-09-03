@@ -71,26 +71,35 @@ protected:
         Opt::NONE,
     };
 
-    constexpr static std::array<Opt, 2> MultiPosCameraIMU = {
-        // first batch optimization
-        Opt::OPT_SO3_SPLINE | Opt::OPT_SCALE_SPLINE | Opt::OPT_GRAVITY | Opt::OPT_SO3_CmToBr |
-            Opt::OPT_POS_CmInBr | Opt::OPT_TO_CmToBr | Opt::OPT_VISUAL_DEPTH,
-        // second batch optimization (append to last)
-        // Opt::OPT_SO3_BiToBr | Opt::OPT_POS_BiInBr | Opt::OPT_TO_BiToBr |
-        //     Opt::OPT_RS_CAM_READOUT_TIME | Opt::OPT_CAM_FOCAL_LEN | Opt::OPT_CAM_PRINCIPAL_POINT |
-        //     Opt::OPT_ACCE_BIAS | Opt::OPT_GYRO_BIAS,
+    // Staged unlocking for position-trajectory cameras: keep extrinsics fixed early,
+    // then unlock time offsets, rotations, translations, and finally IMU/RS/intrinsics.
+    constexpr static std::array<Opt, 5> MultiPosCameraIMU = {
+        // 0) splines + gravity + depths only
+        Opt::OPT_SO3_SPLINE | Opt::OPT_SCALE_SPLINE | Opt::OPT_GRAVITY | Opt::OPT_VISUAL_DEPTH,
+        // 1) unlock camera time offsets
+        Opt::OPT_TO_CmToBr,
+        // 2) unlock camera rotations
+        Opt::OPT_SO3_CmToBr,
+        // 3) unlock camera translations
+        Opt::OPT_POS_CmInBr,
+        // 4) finally unlock IMU extrinsics/time, RS readout, and IMU biases
         Opt::OPT_SO3_BiToBr | Opt::OPT_POS_BiInBr | Opt::OPT_TO_BiToBr |
-            Opt::OPT_RS_CAM_READOUT_TIME | Opt::OPT_ACCE_BIAS | Opt::OPT_GYRO_BIAS};
+            Opt::OPT_RS_CAM_READOUT_TIME | Opt::OPT_ACCE_BIAS | Opt::OPT_GYRO_BIAS };
 
-    constexpr static std::array<Opt, 2> MultiVelCameraIMU = {
-        // first batch optimization
-        Opt::OPT_SO3_SPLINE | Opt::OPT_SCALE_SPLINE | Opt::OPT_GRAVITY | Opt::OPT_SO3_CmToBr |
-            Opt::OPT_POS_CmInBr | Opt::OPT_TO_CmToBr |
-            Opt::OPT_VISUAL_DEPTH,  // we always estimate the depth for vel-derived optical cameras
-        // second batch optimization (append to last)
+    // Staged unlocking for velocity-trajectory cameras (depths always estimated for vel cams)
+    constexpr static std::array<Opt, 5> MultiVelCameraIMU = {
+        // 0) splines + gravity + depths only
+        Opt::OPT_SO3_SPLINE | Opt::OPT_SCALE_SPLINE | Opt::OPT_GRAVITY | Opt::OPT_VISUAL_DEPTH,
+        // 1) unlock camera time offsets
+        Opt::OPT_TO_CmToBr,
+        // 2) unlock camera rotations
+        Opt::OPT_SO3_CmToBr,
+        // 3) unlock camera translations
+        Opt::OPT_POS_CmInBr,
+        // 4) finally unlock IMU extrinsics/time, RS readout, and IMU biases and intrinsics
         Opt::OPT_SO3_BiToBr | Opt::OPT_POS_BiInBr | Opt::OPT_TO_BiToBr |
             Opt::OPT_RS_CAM_READOUT_TIME | Opt::OPT_CAM_FOCAL_LEN | Opt::OPT_CAM_PRINCIPAL_POINT |
-            Opt::OPT_ACCE_BIAS | Opt::OPT_GYRO_BIAS};
+            Opt::OPT_ACCE_BIAS | Opt::OPT_GYRO_BIAS };
 
     constexpr static std::array<Opt, 2> MultiRGBDIMU = {
         // first batch optimization

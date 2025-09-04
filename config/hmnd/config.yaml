@@ -128,9 +128,8 @@ Configor:
     # Output options for analysis and visualization
     Outputs:
       - ParamInEachIter
-      - VisualMaps
-      - AlignedInertialMes
       - VisualReprojErrors
+      - AlignedInertialMes
     
     # Output format
     OutputDataFormat: "YAML"

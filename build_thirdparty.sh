@@ -32,17 +32,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# update submodules
-echo "----------------------------------------------------"
-echo "update submodules remotely, it may take some time..."
-echo "----------------------------------------------------"
-git submodule update --init --recursive
-if [ $? -ne 0 ]; then
-    echo "--------------------------------------------"
-    echo "error occurs when updating submodules, exit!"
-    echo "--------------------------------------------"
-    exit
-fi
+# thirdparty sources are vendored in-repo (no submodules)
+echo "----------------------------------------------"
+echo "using vendored thirdparty sources in-repo..."
+echo "----------------------------------------------"
 
 # shellcheck disable=SC2046
 IKALIBR_ROOT_PATH=$(cd $(dirname $0) || exit; pwd)
@@ -95,7 +88,6 @@ echo "-----------------------------"
 
 # shellcheck disable=SC2164
 cd "${IKALIBR_ROOT_PATH}"/thirdparty/ufomap
-git checkout origin/devel_surfel
 
 mkdir -p ${IKALIBR_ROOT_PATH}/thirdparty/ufomap-build
 # shellcheck disable=SC2164

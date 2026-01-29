@@ -55,7 +55,7 @@ For more details, please refer to our article :point_down::
 
 
 + install available operation systems and required third libraries.
-+ clone `iKalibr` and its submodules on github, compile submodules.
++ clone `iKalibr` from github and build vendored thirdparty sources.
 + compile `iKalibr` (this would require some time).
 
 

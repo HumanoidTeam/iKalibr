@@ -52,7 +52,8 @@ class SpatialTemporalPriori {
 public:
     using Ptr = std::shared_ptr<SpatialTemporalPriori>;
     using FromTo = std::pair<std::string, std::string>;
-    constexpr static double PrioriWeight = 1E5;
+    // Prior weights are now configurable via YAML config (Configor::Prior::PrioriWeight*)
+    // See config.yaml -> Prior section for current values
 
 public:
     // extrinsics

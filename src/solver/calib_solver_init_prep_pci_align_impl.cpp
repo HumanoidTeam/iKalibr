@@ -88,8 +88,6 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
         const auto rotEstimator = RotationEstimator::Create();
 
         bar = std::make_shared<tqdm>();
-        // auto prevTimestamp = -1.0;
-        // int prevFrameId = -1;
         for (int i = 0; i < static_cast<int>(frameVec.size()); ++i) {
             bar->progress(i, static_cast<int>(frameVec.size()));
 
@@ -100,7 +98,8 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
             }
 
             // we do not want to try to recover the extrinsic rotation too frequent
-            if ((odometer->GetRotations().size() < std::min(400, static_cast<int>(frameVec.size()))) ||
+            // Use 600 frames minimum before attempting rotation estimation
+            if ((odometer->GetRotations().size() < std::min(600, static_cast<int>(frameVec.size()))) ||
                 (odometer->GetRotations().size() % 5 != 0)) {
                 continue;
             }
@@ -117,14 +116,25 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
                 break;
             }
         }
+        
+        // If we haven't solved yet but have enough rotations, try one final estimation
+        if (!rotEstimator->SolveStatus() && odometer->GetRotations().size() >= 400) {
+            rotEstimator->Estimate(so3Spline, odometer->GetRotations());
+            if (rotEstimator->SolveStatus()) {
+                _parMagr->EXTRI.SO3_CmToBr.at(topic) = rotEstimator->GetSO3SensorToSpline();
+            }
+        }
+        
         if (!rotEstimator->SolveStatus()) {
-            throw Status(Status::ERROR,
-                         "initialize rotation 'SO3_CmToBr' failed, this may be related to "
-                         "insufficiently excited motion or bad images.");
+            spdlog::error("initialize rotation 'SO3_CmToBr' failed for '{}', this may be related to "
+                         "insufficiently excited motion or bad images.", topic);
+            // Don't throw - continue with other cameras and use prior rotation
+            spdlog::warn("Using prior rotation for '{}' instead", topic);
         } else {
             spdlog::info("extrinsic rotation of '{}' is recovered using '{:06}' frames", topic,
                          odometer->GetRotations().size());
         }
+        spdlog::info("[DEBUG] About to call _viewer->UpdateSensorViewer()");
         _viewer->UpdateSensorViewer();
 
         rotOnlyOdom.insert({topic, odometer});

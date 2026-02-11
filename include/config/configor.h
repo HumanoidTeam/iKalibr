@@ -263,6 +263,10 @@ public:
         static double TimeOffsetPadding;
         static double ReadoutTimePadding;
         static double MapDownSample;
+        // Configurable prior weights for extrinsics constraints
+        static double PrioriWeightSO3;   // Rotation prior weight
+        static double PrioriWeightPOS;   // Translation prior weight
+        static double PrioriWeightTO;    // Time offset prior weight
 
         static struct KnotTimeDist {
             static double SO3Spline;
@@ -323,6 +327,7 @@ public:
                CEREAL_NVP(GravityDirectionX), CEREAL_NVP(GravityDirectionY), CEREAL_NVP(GravityDirectionZ),
                CEREAL_NVP(OptTemporalParams), CEREAL_NVP(TimeOffsetPadding),
                CEREAL_NVP(ReadoutTimePadding), CEREAL_NVP(MapDownSample),
+               CEREAL_NVP(PrioriWeightSO3), CEREAL_NVP(PrioriWeightPOS), CEREAL_NVP(PrioriWeightTO),
                cereal::make_nvp("KnotTimeDist", knotTimeDist),
                cereal::make_nvp("NDTLiDAROdometer", ndtLiDAROdometer),
                cereal::make_nvp("LiDARDataAssociate", lidarDataAssociate));

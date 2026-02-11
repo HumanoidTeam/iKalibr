@@ -96,6 +96,10 @@ double Configor::Prior::GravityDirectionZ = -1.0;
 double Configor::Prior::TimeOffsetPadding = {};
 double Configor::Prior::ReadoutTimePadding = {};
 double Configor::Prior::MapDownSample = {};
+// Configurable prior weights with defaults
+double Configor::Prior::PrioriWeightSO3 = 500.0;   // Rotation prior weight
+double Configor::Prior::PrioriWeightPOS = 500.0;   // Translation prior weight
+double Configor::Prior::PrioriWeightTO = 1000.0;   // Time offset prior weight
 
 double Configor::Prior::KnotTimeDist::SO3Spline = {};
 double Configor::Prior::KnotTimeDist::ScaleSpline = {};

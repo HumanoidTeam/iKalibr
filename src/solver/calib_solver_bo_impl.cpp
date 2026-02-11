@@ -251,11 +251,11 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
     ceres::Solver::Options strictOptions = _ceresOption;
     // Prefer LM for robustness on large, mixed-unit problems
     strictOptions.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
-    // Allow more iterations and use practical tolerances
+    // Allow more iterations with looser tolerances to prevent early stopping
     strictOptions.max_num_iterations = 300;
-    strictOptions.function_tolerance = 1e-6;
-    strictOptions.gradient_tolerance = 1e-8;
-    strictOptions.parameter_tolerance = 1e-8;
+    strictOptions.function_tolerance = 1e-4;   // Was 1e-6, allow more iterations
+    strictOptions.gradient_tolerance = 1e-6;   // Was 1e-8
+    strictOptions.parameter_tolerance = 1e-6;  // Was 1e-8
     // Enable inner iterations to help temporal/readout parameters settle
     strictOptions.use_inner_iterations = true;
     // Prefer sparse Schur on CPU

@@ -972,6 +972,38 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
         auto ar = GetOutputArchiveVariant(file, Configor::Preference::OutputDataFormat);
         SerializeByOutputArchiveVariant(ar, Configor::Preference::OutputDataFormat,
                                         cereal::make_nvp("reproj_errors", reprojErrors));
+        
+        // Compute and log per-camera residual statistics
+        if (!reprojErrors.empty()) {
+            double sum = 0.0, sumSq = 0.0, maxErr = 0.0;
+            int count = 0, above2px = 0, above5px = 0;
+            for (const auto& res : reprojErrors) {
+                double norm = res.norm();
+                sum += norm;
+                sumSq += norm * norm;
+                maxErr = std::max(maxErr, norm);
+                if (norm > 2.0) above2px++;
+                if (norm > 5.0) above5px++;
+                count++;
+            }
+            double mean = sum / count;
+            double variance = (sumSq / count) - (mean * mean);
+            double stddev = std::sqrt(std::max(0.0, variance));
+            
+            // Extract short camera name from topic
+            std::string shortName = topic;
+            size_t lastSlash = topic.rfind('/');
+            if (lastSlash != std::string::npos && lastSlash > 0) {
+                size_t prevSlash = topic.rfind('/', lastSlash - 1);
+                if (prevSlash != std::string::npos) {
+                    shortName = topic.substr(prevSlash + 1, lastSlash - prevSlash - 1);
+                }
+            }
+            
+            spdlog::info("  [REPROJ] {}: count={}, mean={:.2f}px, std={:.2f}px, max={:.2f}px, >2px={:.1f}%, >5px={:.1f}%",
+                        shortName, count, mean, stddev, maxErr,
+                        100.0 * above2px / count, 100.0 * above5px / count);
+        }
     }
     spdlog::info("saving visual reprojection errors finished!");
 }

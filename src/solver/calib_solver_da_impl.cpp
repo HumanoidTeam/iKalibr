@@ -453,7 +453,30 @@ CalibSolver::DataAssociationForPosCameras() const {
                                                Configor::DataStream::CameraTopics.at(topic).Type))
                 ->Association(*sfmData, _parMagr->INTRI.Camera.at(topic));
         _viewer->AddVeta(sfmData, Viewer::VIEW_MAP);
-        spdlog::info("visual reprojection sequences for '{}': {}", topic, corrs.at(topic).size());
+        
+        // Enhanced per-camera SfM statistics for diagnostics
+        size_t totalCorrs = 0;
+        size_t totalTracks = corrs.at(topic).size();
+        double avgTrackLen = 0.0;
+        for (const auto& seq : corrs.at(topic)) {
+            totalCorrs += seq->corrs.size();
+        }
+        if (totalTracks > 0) {
+            avgTrackLen = static_cast<double>(totalCorrs) / totalTracks;
+        }
+        
+        // Extract short camera name
+        std::string shortName = topic;
+        size_t lastSlash = topic.rfind('/');
+        if (lastSlash != std::string::npos && lastSlash > 0) {
+            size_t prevSlash = topic.rfind('/', lastSlash - 1);
+            if (prevSlash != std::string::npos) {
+                shortName = topic.substr(prevSlash + 1, lastSlash - prevSlash - 1);
+            }
+        }
+        
+        spdlog::info("[SFM] {}: tracks={}, correspondences={}, avg_track_len={:.1f}",
+                    shortName, totalTracks, totalCorrs, avgTrackLen);
     }
     return corrs;
 }

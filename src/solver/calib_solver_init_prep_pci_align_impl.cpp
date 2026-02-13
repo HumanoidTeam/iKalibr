@@ -278,7 +278,22 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
         spdlog::info("store images of '{}' for SfM...", topic);
         bool sfm_run = StoreImagesForSfM(topic, sfm->FindCovisibility(0.1));
 
-        if (!sfm_run) {
+        if (sfm_run) {
+            // CRITICAL FIX: Reload the SfM data we just computed
+            spdlog::info("SfM completed for '{}', reloading data...", topic);
+            auto veta_reload = TryLoadSfMData(topic, isRS ? 2.0 : 1.0, trackLengthMin);
+            if (veta_reload != nullptr) {
+                // Downsample and store in data manager
+                DownsampleVeta(veta_reload, 10000, trackLengthMin);
+                _dataMagr->SetSfMData(topic, veta_reload);
+                _viewer->AddVeta(veta_reload, Viewer::VIEW_MAP);
+                spdlog::info("SfM data for camera '{}' loaded after running SfM! view count: {}, landmark count: {}",
+                             topic, veta_reload->views.size(), veta_reload->structure.size());
+            } else {
+                ++needSfMCount;
+                spdlog::error("SfM ran but failed to load data for '{}' - visual measurements will be missing!", topic);
+            }
+        } else {
             ++needSfMCount;
         }
     }

@@ -115,23 +115,12 @@ int main(int argc, char **argv) {
          * In headless mode, we need to avoid the viewer thread hanging issue.
          */
         
-        spdlog::info("Processing complete. Exiting...");
+        spdlog::info("Processing complete. Requesting shutdown...");
 
-        // Unconditionally terminate to avoid GUI/viewer hang. Send SIGINT then exit process.
-        spdlog::warn("Forcing termination: raising SIGINT and exiting now.");
-        std::raise(SIGINT);
-        // Ensure logs are flushed before exiting
+        ros::requestShutdown();
+        ros::spinOnce();
         spdlog::shutdown();
-        // Exit without unwinding stack to avoid blocking in destructors (e.g., viewer thread)
-        std::quick_exit(0);
-        // Force ROS shutdown first
-        ros::shutdown();
-        
-        // In headless mode, don't try to clean up the solver properly
-        // as it will hang trying to join the stuck viewer thread
-        // Just let the process exit naturally
-        
-        return 0;
+        std::_Exit(0);
     } catch (const ns_ikalibr::IKalibrStatus &status) {
         // if error happened, print it
         static constexpr auto FStyle = fmt::emphasis::italic | fmt::fg(fmt::color::green);

@@ -113,9 +113,33 @@ public:
                                   const T *CX,
                                   const T *CY,
                                   const Eigen::Vector2<T> &feat,
-                                  Eigen::Vector3<T> *P) {
-        P->operator()(0) = (feat(0) - *CX) * *FX_INV;
-        P->operator()(1) = (feat(1) - *CY) * *FY_INV;
+                                  Eigen::Vector3<T> *P,
+                                  const double *distoK = nullptr) {
+        Eigen::Vector2<T> p_norm;
+        p_norm(0) = (feat(0) - *CX) * *FX_INV;
+        p_norm(1) = (feat(1) - *CY) * *FY_INV;
+
+        if (distoK != nullptr) {
+            const T eps = T(1e-8);
+            using std::sqrt; using std::tan;
+            T theta_dist = sqrt(p_norm(0) * p_norm(0) + p_norm(1) * p_norm(1));
+            T theta = theta_dist;
+            for (int j = 0; j < 10; ++j) {
+                T theta2 = theta * theta;
+                T theta4 = theta2 * theta2;
+                T theta6 = theta4 * theta2;
+                T theta8 = theta6 * theta2;
+                theta = theta_dist /
+                        (T(1.0) + T(distoK[0]) * theta2 + T(distoK[1]) * theta4 +
+                         T(distoK[2]) * theta6 + T(distoK[3]) * theta8);
+            }
+            T scale = theta_dist > eps ? tan(theta) / theta_dist : T(1.0);
+            p_norm(0) *= scale;
+            p_norm(1) *= scale;
+        }
+
+        P->operator()(0) = p_norm(0);
+        P->operator()(1) = p_norm(1);
         P->operator()(2) = (T)1.0;
     }
 
@@ -125,9 +149,32 @@ public:
                                   const T *CX,
                                   const T *CY,
                                   const Eigen::Vector3<T> &P,
-                                  Eigen::Vector2<T> *feat) {
-        feat->operator()(0) = *FX * P(0) + *CX;
-        feat->operator()(1) = *FY * P(1) + *CY;
+                                  Eigen::Vector2<T> *feat,
+                                  const double *distoK = nullptr) {
+        Eigen::Vector2<T> p_norm;
+        p_norm(0) = P(0);
+        p_norm(1) = P(1);
+
+        if (distoK != nullptr) {
+            const T eps = T(1e-8);
+            using std::sqrt; using std::atan;
+            T r = sqrt(p_norm(0) * p_norm(0) + p_norm(1) * p_norm(1));
+            T theta = atan(r);
+            T theta2 = theta * theta;
+            T theta3 = theta2 * theta;
+            T theta5 = theta3 * theta2;
+            T theta7 = theta5 * theta2;
+            T theta9 = theta7 * theta2;
+            T theta_dist =
+                theta + T(distoK[0]) * theta3 + T(distoK[1]) * theta5 +
+                T(distoK[2]) * theta7 + T(distoK[3]) * theta9;
+            T cdist = r > eps ? theta_dist / r : T(1.0);
+            p_norm(0) *= cdist;
+            p_norm(1) *= cdist;
+        }
+
+        feat->operator()(0) = *FX * p_norm(0) + *CX;
+        feat->operator()(1) = *FY * p_norm(1) + *CY;
     }
 };
 

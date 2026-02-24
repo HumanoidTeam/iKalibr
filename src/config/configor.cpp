@@ -100,6 +100,9 @@ double Configor::Prior::MapDownSample = {};
 double Configor::Prior::PrioriWeightSO3 = 500.0;   // Rotation prior weight
 double Configor::Prior::PrioriWeightPOS = 500.0;   // Translation prior weight
 double Configor::Prior::PrioriWeightTO = 1000.0;   // Time offset prior weight
+double Configor::Prior::MaxTemporalSpan = 3.0;     // Max temporal gap for visual reprojection pairs
+double Configor::Prior::PositionPadding = 0.015;   // Max translation correction from prior
+bool Configor::Prior::SfMRefineTimeOffset = false;  // Whether to refine TOs beyond rotation alignment
 
 double Configor::Prior::KnotTimeDist::SO3Spline = {};
 double Configor::Prior::KnotTimeDist::ScaleSpline = {};
@@ -123,7 +126,7 @@ const double Configor::Prior::LossForRadarDopplerFactor = 0.1;
 // the loss function used for lidar factor (m)
 const double Configor::Prior::LossForPointToSurfelFactor = 0.02;
 // the loss function used for visual reprojection factor (pixel)
-const double Configor::Prior::LossForReprojFactor = 1.0;
+double Configor::Prior::LossForReprojFactor = 2.0;
 // the loss function used for visual optical flow factor (pixel) (on the image pixel plane)
 const double Configor::Prior::LossForOpticalFlowFactor = 30.0;
 

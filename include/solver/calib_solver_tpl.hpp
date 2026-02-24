@@ -102,12 +102,17 @@ void CalibSolver::AddVisualReprojectionFactor(Estimator::Ptr &estimator,
                                               Estimator::Opt option) {
     double weight = Configor::DataStream::CameraTopics.at(camTopic).Weight;
 
+    std::size_t totalCorrs = 0;
     for (const auto &corr : corrs) {
         for (const auto &c : corr->corrs) {
             estimator->AddVisualReprojection<type>(
                 c, camTopic, globalScale, corr->invDepthFir.get(), option, weight * c->weight);
+            ++totalCorrs;
         }
     }
+
+    spdlog::info("[VISUAL] Camera '{}': {} factors added, weight={:.1f}, globalScale={:.6f}",
+                 camTopic, totalCorrs, weight, *globalScale);
 }
 
 template <TimeDeriv::ScaleSplineType type, bool IsInvDepth>

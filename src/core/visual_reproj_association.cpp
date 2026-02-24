@@ -33,7 +33,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include "core/visual_reproj_association.h"
+#include "config/configor.h"
 #include "factor/data_correspondence.h"
+#include "spdlog/spdlog.h"
 #include "veta/veta.h"
 
 namespace {
@@ -54,25 +56,23 @@ std::vector<VisualReProjCorrSeq::Ptr> VisualReProjAssociator::Association(
     // scale weight from image pixel to real scale
     const double weight = intri->ImagePlaneToCameraPlaneError(1.0);
 
+    const double maxSpan = Configor::Prior::MaxTemporalSpan;
+
     std::vector<VisualReProjCorrSeq::Ptr> corrVec;
     corrVec.reserve(veta.structure.size());
+    std::size_t totalPairs = 0, skippedPairs = 0;
 
     for (const auto &[lmId, lm] : veta.structure) {
         auto begIter = lm.obs.cbegin();
         const auto &[viewIdFir, featFir] = *begIter;
         const auto &viewFir = veta.views.find(viewIdFir)->second;
-        // row / image height - ExposureFactor
-        // attention: computed based on raw pixel rather undistorted pixel
+        // RS line factor: use distorted pixel Y directly (features are already in distorted space)
         const double lFir =
-            intri->GetDistoPixel(featFir.x)(1) / static_cast<double>(viewFir->imgHeight) -
-            ExposureFactor;
+            featFir.x(1) / static_cast<double>(viewFir->imgHeight) - ExposureFactor;
 
         auto corrSeq = std::make_shared<VisualReProjCorrSeq>();
 
-        // bring landmark from world frame to the first camera frame which first obverses this
-        // landmark
         Eigen::Vector3d lmInFir = veta.poses.at(viewFir->poseId).Inverse().operator()(lm.X);
-        // inverse depth
         corrSeq->invDepthFir = std::make_unique<double>(1.0 / lmInFir(2));
         corrSeq->lmId = lmId;
         corrSeq->corrs.reserve(lm.obs.size() - 1);
@@ -82,24 +82,33 @@ std::vector<VisualReProjCorrSeq::Ptr> VisualReProjAssociator::Association(
         for (auto curIter = std::next(begIter); curIter != lm.obs.cend(); ++curIter) {
             const auto &[viewIdCur, featCur] = *curIter;
             const auto &viewCur = veta.views.find(viewIdCur)->second;
-            // row / image height - ExposureFactor
-            // attention: computed based on raw pixel rather undistorted pixel
+
+            ++totalPairs;
+            if (maxSpan > 0 &&
+                std::abs(viewCur->timestamp - viewFir->timestamp) > maxSpan) {
+                ++skippedPairs;
+                continue;
+            }
+
             const double lCur =
-                intri->GetDistoPixel(featCur.x)(1) / static_cast<double>(viewCur->imgHeight) -
-                ExposureFactor;
+                featCur.x(1) / static_cast<double>(viewCur->imgHeight) - ExposureFactor;
 
             corrSeq->corrs.push_back(VisualReProjCorr::Create(
-                // timestamps
                 viewFir->timestamp, viewCur->timestamp,
-                // feature location in image plane (has been undistorted)
                 featFir.x, featCur.x,
-                // row / image height - ExposureFactor: v/h - ExposureFactor
                 lFir, lCur,
-                // rough weight
                 weight));
         }
-        corrVec.push_back(corrSeq);
+        if (!corrSeq->corrs.empty()) {
+            corrVec.push_back(corrSeq);
+        }
     }
+
+    spdlog::info("[TEMPORAL_FILTER] MaxTemporalSpan={:.1f}s: kept {} pairs, "
+                 "skipped {} ({:.0f}%), landmarks with pairs: {}",
+                 maxSpan, totalPairs - skippedPairs, skippedPairs,
+                 totalPairs > 0 ? 100.0 * skippedPairs / totalPairs : 0.0,
+                 corrVec.size());
 
     return corrVec;
 }

@@ -57,25 +57,38 @@ private:
 
     double _so3DtInv, _scaleDtInv;
     double _weight;
+    bool _haveDisto;
+    double _distoK[4];
 
 public:
     explicit VisualReProjFactor(ns_ctraj::SplineMeta<Order> rotMeta,
                                 ns_ctraj::SplineMeta<Order> linScaleMeta,
                                 VisualReProjCorr::Ptr visualCorr,
-                                double weight)
+                                double weight,
+                                const double *distoK = nullptr)
         : _so3Meta(rotMeta),
           _scaleMeta(std::move(linScaleMeta)),
           _corr(std::move(visualCorr)),
           _so3DtInv(1.0 / rotMeta.segments.front().dt),
           _scaleDtInv(1.0 / _scaleMeta.segments.front().dt),
-          _weight(weight) {}
+          _weight(weight),
+          _haveDisto(distoK != nullptr),
+          _distoK{0, 0, 0, 0} {
+        if (distoK) {
+            _distoK[0] = distoK[0];
+            _distoK[1] = distoK[1];
+            _distoK[2] = distoK[2];
+            _distoK[3] = distoK[3];
+        }
+    }
 
     static auto Create(const ns_ctraj::SplineMeta<Order> &rotMeta,
                        const ns_ctraj::SplineMeta<Order> &linScaleMeta,
                        const VisualReProjCorr::Ptr &visualCorr,
-                       double weight) {
+                       double weight,
+                       const double *distoK = nullptr) {
         return new ceres::DynamicAutoDiffCostFunction<VisualReProjFactor>(
-            new VisualReProjFactor(rotMeta, linScaleMeta, visualCorr, weight));
+            new VisualReProjFactor(rotMeta, linScaleMeta, visualCorr, weight, distoK));
     }
 
     static std::size_t TypeHashCode() { return typeid(VisualReProjFactor).hash_code(); }
@@ -152,15 +165,17 @@ public:
         Sophus::SE3<T> SE3_BrIToBrJ = SE3_BrToBr0_J.inverse() * SE3_BrToBr0_I;
         Sophus::SE3<T> SE3_CmIToCmJ = SE3_CmToBr.inverse() * SE3_BrIToBrJ * SE3_CmToBr;
 
+        const double *dk = _haveDisto ? _distoK : nullptr;
+
         Eigen::Vector3<T> PI;
         VisualReProjCorr::TransformImgToCam<T>(&FX_INV, &FY_INV, &CX, &CY, _corr->fi.cast<T>(),
-                                               &PI);
+                                               &PI, dk);
         PI *= DEPTH * GLOBAL_SCALE;
 
         Eigen::Vector3<T> PJ = SE3_CmIToCmJ * PI;
         PJ /= PJ(2);
         Eigen::Vector2<T> fjPred;
-        VisualReProjCorr::TransformCamToImg<T>(&FX, &FY, &CX, &CY, PJ, &fjPred);
+        VisualReProjCorr::TransformCamToImg<T>(&FX, &FY, &CX, &CY, PJ, &fjPred, dk);
 
         Eigen::Map<Eigen::Vector2<T>> residuals(sResiduals);
         residuals = fjPred - _corr->fj.cast<T>();

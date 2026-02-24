@@ -167,6 +167,11 @@ public:
                 // Opt::OPT_RS_CAM_READOUT_TIME);
             }
         }
+        if (!Configor::Prior::SfMRefineTimeOffset) {
+            for (auto &opt : options) {
+                RemoveOption(opt, Opt::OPT_TO_CmToBr);
+            }
+        }
         return options;
     }
 

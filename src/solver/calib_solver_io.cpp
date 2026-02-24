@@ -928,6 +928,19 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
             spdlog::warn("create sub directory for '{}' failed: '{}'", topic, subSaveDir);
             continue;
         }
+        const double *distoK = nullptr;
+        double distoCoeffs[4] = {0, 0, 0, 0};
+        if (intri->HaveDisto()) {
+            auto allParams = intri->GetParams();
+            if (allParams.size() >= 8) {
+                distoCoeffs[0] = allParams[4];
+                distoCoeffs[1] = allParams[5];
+                distoCoeffs[2] = allParams[6];
+                distoCoeffs[3] = allParams[7];
+                distoK = distoCoeffs;
+            }
+        }
+
         std::list<Eigen::Vector2d> reprojErrors;
 
         for (const auto &corrs : corrsVec) {
@@ -935,14 +948,12 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
             const double DEPTH = 1.0 / INV_DEPTH;
 
             for (const auto &corr : corrs->corrs) {
-                // calculate the so3 and lin scale offset for i-feat
                 double timeIByBr = corr->ti + TO_CmToBr + corr->li * READOUT_TIME;
                 auto SE3_BrToBr0_I = _solver->CurBrToW(timeIByBr);
                 if (SE3_BrToBr0_I == std::nullopt) {
                     continue;
                 }
 
-                // calculate the so3 and lin scale offset for j-feat
                 auto timeJByBr = corr->tj + TO_CmToBr + corr->lj * READOUT_TIME;
                 auto SE3_BrToBr0_J = _solver->CurBrToW(timeJByBr);
                 if (SE3_BrToBr0_J == std::nullopt) {
@@ -954,13 +965,14 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
 
                 Eigen::Vector3d PI;
                 VisualReProjCorr::TransformImgToCam<double>(&FX_INV, &FY_INV, &CX, &CY, corr->fi,
-                                                            &PI);
+                                                            &PI, distoK);
                 PI *= DEPTH * GLOBAL_SCALE;
 
                 Eigen::Vector3d PJ = SE3_CmIToCmJ * PI;
                 PJ /= PJ(2);
                 Eigen::Vector2d fjPred;
-                VisualReProjCorr::TransformCamToImg<double>(&FX, &FY, &CX, &CY, PJ, &fjPred);
+                VisualReProjCorr::TransformCamToImg<double>(&FX, &FY, &CX, &CY, PJ, &fjPred,
+                                                            distoK);
 
                 Eigen::Vector2d residuals = fjPred - corr->fj;
                 reprojErrors.push_back(residuals);

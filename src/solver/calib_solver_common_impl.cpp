@@ -495,12 +495,7 @@ ns_veta::Veta::Ptr CalibSolver::TryLoadSfMData(const std::string &topic,
 
     const auto &nameToOurIdx = info.GetImagesNameToIdx();
     for (const auto &[IdFromColmap, image] : images) {
-        // Safe lookup - skip if image name not in map (can happen with bridged SfM)
-        auto nameIt = nameToOurIdx.find(image.name_);
-        if (nameIt == nameToOurIdx.end()) {
-            continue;
-        }
-        const auto &viewId = nameIt->second;
+        const auto &viewId = nameToOurIdx.at(image.name_);
         const auto &poseId = viewId;
 
         auto frameIter = ourIdxToCamFrame.find(viewId);
@@ -546,14 +541,11 @@ ns_veta::Veta::Ptr CalibSolver::TryLoadSfMData(const std::string &topic,
         lm.color = pt3d.color_;
 
         for (const auto &track : pt3d.track_) {
-            // Safe lookup for image - skip if not found
             auto imgIt = images.find(track.image_id);
             if (imgIt == images.end()) {
                 continue;
             }
             const auto &img = imgIt->second;
-            
-            // Safe bounds check for point2D
             if (track.point2D_idx >= img.points2D_.size()) {
                 continue;
             }
@@ -566,12 +558,11 @@ ns_veta::Veta::Ptr CalibSolver::TryLoadSfMData(const std::string &topic,
                 continue;
             }
 
-            // Safe lookup for nameToOurIdx
-            auto nameIt = nameToOurIdx.find(img.name_);
-            if (nameIt == nameToOurIdx.end()) {
+            auto nameIt2 = nameToOurIdx.find(img.name_);
+            if (nameIt2 == nameToOurIdx.end()) {
                 continue;
             }
-            const auto viewId = nameIt->second;
+            const auto viewId = nameIt2->second;
             // this frame is not involved in solving
             if (veta->views.find(viewId) == veta->views.cend()) {
                 continue;

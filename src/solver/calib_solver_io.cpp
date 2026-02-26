@@ -937,7 +937,13 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
                 distoCoeffs[1] = allParams[5];
                 distoCoeffs[2] = allParams[6];
                 distoCoeffs[3] = allParams[7];
-                distoK = distoCoeffs;
+                bool allZero = (std::abs(distoCoeffs[0]) < 1e-12 &&
+                                std::abs(distoCoeffs[1]) < 1e-12 &&
+                                std::abs(distoCoeffs[2]) < 1e-12 &&
+                                std::abs(distoCoeffs[3]) < 1e-12);
+                if (!allZero) {
+                    distoK = distoCoeffs;
+                }
             }
         }
 

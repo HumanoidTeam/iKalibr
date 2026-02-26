@@ -361,11 +361,14 @@ void CalibParamManager::ShowParamStatus() {
                         << FormatValueVector<double>({"k1", "k2"}, {pars.at(4), pars.at(5)}))
             STREAM_PACK(PARAM("                ")
                         << FormatValueVector<double>({"k3", "k4"}, {pars.at(6), pars.at(7)}))
+        } else if (!intri->HaveDisto()) {
+            STREAM_PACK(PARAM("DISTO   PARAMS: ") << "none (plain pinhole)")
         } else {
             throw Status(Status::CRITICAL,
                          "unknown camera intrinsic model! supported models:\n"
                          "(a) pinhole_brown_t2 (k1, k2, k3, p1, p2)\n"
-                         "(b)  pinhole_fisheye (k1, k2, k3, k4)");
+                         "(b)  pinhole_fisheye (k1, k2, k3, k4)\n"
+                         "(c)  pinhole (no distortion)");
         }
         STREAM_PACK("")
     }

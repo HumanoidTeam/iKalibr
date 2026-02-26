@@ -280,6 +280,37 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
 
         if (!sfm_run) {
             ++needSfMCount;
+        } else {
+            // Internal COLMAP completed — reload the SfM data it produced
+            auto veta = TryLoadSfMData(topic, isRS ? 2.0 : 1.0, trackLengthMin);
+            if (veta != nullptr) {
+                spdlog::info("internal SfM for '{}' succeeded, loading result", topic);
+                DownsampleVeta(veta, 10000, trackLengthMin);
+                _dataMagr->SetSfMData(topic, veta);
+                _viewer->AddVeta(veta, Viewer::VIEW_MAP);
+
+                spdlog::info(
+                    "SfM info for topic '{}' after filtering: view count: {}, landmark count: {}",
+                    topic, veta->views.size(), veta->structure.size());
+
+                // Internal COLMAP undistorts images and uses PINHOLE, so features
+                // are in undistorted space. Zero out distortion coefficients so
+                // the factor does pure pinhole projection (allZero → distoK=nullptr).
+                auto intri = std::dynamic_pointer_cast<ns_veta::PinholeIntrinsicFisheye>(
+                    _parMagr->INTRI.Camera.at(topic));
+                if (intri) {
+                    auto p = intri->GetParams();
+                    // GetParams returns [fx, fy, cx, cy, k1, k2, k3, k4]
+                    if (p.size() >= 8) {
+                        p[4] = 0.0; p[5] = 0.0; p[6] = 0.0; p[7] = 0.0;
+                        intri->UpdateFromParams(p);
+                        spdlog::info("zeroed distortion for '{}' (internal SfM uses PINHOLE)", topic);
+                    }
+                }
+            } else {
+                spdlog::error("internal SfM for '{}' ran but TryLoadSfMData still failed", topic);
+                ++needSfMCount;
+            }
         }
     }
     if (needSfMCount != 0) {

@@ -35,7 +35,7 @@
 #include "calib/calib_param_manager.h"
 #include "util/status.hpp"
 #include "util/utils_tpl.hpp"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "opencv2/calib3d.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "spdlog/spdlog.h"
@@ -158,8 +158,9 @@ CalibParamManager::Ptr CalibParamManager::InitParamsFromConfigor() {
         }
     }
 
-    // align to the negative 'z' axis
-    parMarg->GRAVITY = Eigen::Vector3d(0.0, 0.0, -Configor::Prior::GravityNorm);
+    // align to the user-specified gravity direction (now using three scalars)
+    Eigen::Vector3d gravity_dir(Configor::Prior::GravityDirectionX, Configor::Prior::GravityDirectionY, Configor::Prior::GravityDirectionZ);
+    parMarg->GRAVITY = Configor::Prior::GravityNorm * gravity_dir.normalized();
 
     spdlog::info("initialize calibration parameter manager using configor finished.");
     return parMarg;
@@ -360,11 +361,14 @@ void CalibParamManager::ShowParamStatus() {
                         << FormatValueVector<double>({"k1", "k2"}, {pars.at(4), pars.at(5)}))
             STREAM_PACK(PARAM("                ")
                         << FormatValueVector<double>({"k3", "k4"}, {pars.at(6), pars.at(7)}))
+        } else if (!intri->HaveDisto()) {
+            STREAM_PACK(PARAM("DISTO   PARAMS: ") << "none (plain pinhole)")
         } else {
             throw Status(Status::CRITICAL,
                          "unknown camera intrinsic model! supported models:\n"
                          "(a) pinhole_brown_t2 (k1, k2, k3, p1, p2)\n"
-                         "(b)  pinhole_fisheye (k1, k2, k3, k4)");
+                         "(b)  pinhole_fisheye (k1, k2, k3, k4)\n"
+                         "(c)  pinhole (no distortion)");
         }
         STREAM_PACK("")
     }

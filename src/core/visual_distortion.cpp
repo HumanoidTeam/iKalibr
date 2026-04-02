@@ -83,11 +83,14 @@ cv::Mat VisualUndistortionMap::ObtainDMat(const ns_veta::PinholeIntrinsicPtr &in
     } else if (std::dynamic_pointer_cast<ns_veta::PinholeIntrinsicFisheye>(intri)) {
         // k_1, k_2, k_3, k_4
         D = (cv::Mat_<double>(4, 1) << par[4], par[5], par[6], par[7]);
+    } else if (!intri->HaveDisto()) {
+        D = cv::Mat::zeros(4, 1, CV_64F);
     } else {
         throw Status(Status::CRITICAL,
                      "unknown camera intrinsic model! supported models:\n"
                      "(a) pinhole_brown_t2 (k1, k2, k3, p1, p2)\n"
-                     "(b)  pinhole_fisheye (k1, k2, k3, k4)");
+                     "(b)  pinhole_fisheye (k1, k2, k3, k4)\n"
+                     "(c)  pinhole (no distortion)");
     }
     return D;
 }
@@ -104,12 +107,14 @@ std::pair<cv::Mat, cv::Mat> VisualUndistortionMap::InitUndistortRectifyMap(
         cv::initUndistortRectifyMap(K, D, E, K, size, CV_16SC2, map1, map2);
     } else if (std::dynamic_pointer_cast<ns_veta::PinholeIntrinsicFisheye>(intri)) {
         cv::fisheye::initUndistortRectifyMap(K, D, E, K, size, CV_16SC2, map1, map2);
-        // cv::remap(src, undistImg, map1, map2, cv::INTER_LINEAR, CV_HAL_BORDER_CONSTANT);
+    } else if (!intri->HaveDisto()) {
+        cv::initUndistortRectifyMap(K, D, E, K, size, CV_16SC2, map1, map2);
     } else {
         throw Status(Status::CRITICAL,
                      "unknown camera intrinsic model! supported models:\n"
                      "(a) pinhole_brown_t2 (k1, k2, k3, p1, p2)\n"
-                     "(b)  pinhole_fisheye (k1, k2, k3, k4)");
+                     "(b)  pinhole_fisheye (k1, k2, k3, k4)\n"
+                     "(c)  pinhole (no distortion)");
     }
     return {map1, map2};
 }

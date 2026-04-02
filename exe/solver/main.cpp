@@ -38,11 +38,13 @@
 #include "util/status.hpp"
 #include "util/utils_tpl.hpp"
 #include "solver/calib_solver.h"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "solver/calib_solver_io.h"
 #include "calib/calib_param_manager.h"
 #include "calib/calib_data_manager.h"
 #include "filesystem"
+#include <cstdlib>
+#include <csignal>
 
 namespace {
 bool IKALIBR_UNIQUE_NAME(_2_) = ns_ikalibr::_1_(__FILE__);
@@ -109,8 +111,16 @@ int main(int argc, char **argv) {
         /**
          * this program would continue running here, until the viewer is closed by the users.
          * the viewer is maintained by the 'CalibSolver'.
+         * 
+         * In headless mode, we need to avoid the viewer thread hanging issue.
          */
+        
+        spdlog::info("Processing complete. Requesting shutdown...");
 
+        ros::requestShutdown();
+        ros::spinOnce();
+        spdlog::shutdown();
+        std::_Exit(0);
     } catch (const ns_ikalibr::IKalibrStatus &status) {
         // if error happened, print it
         static constexpr auto FStyle = fmt::emphasis::italic | fmt::fg(fmt::color::green);

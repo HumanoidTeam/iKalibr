@@ -42,7 +42,7 @@
 #include "cv_bridge/cv_bridge.h"
 #include "rosbag/bag.h"
 #include "filesystem"
-#include "spdlog/fmt/bundled/color.h"
+#include "fmt/color.h"
 #include "regex"
 
 namespace {

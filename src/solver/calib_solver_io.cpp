@@ -928,6 +928,25 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
             spdlog::warn("create sub directory for '{}' failed: '{}'", topic, subSaveDir);
             continue;
         }
+        const double *distoK = nullptr;
+        double distoCoeffs[4] = {0, 0, 0, 0};
+        if (intri->HaveDisto()) {
+            auto allParams = intri->GetParams();
+            if (allParams.size() >= 8) {
+                distoCoeffs[0] = allParams[4];
+                distoCoeffs[1] = allParams[5];
+                distoCoeffs[2] = allParams[6];
+                distoCoeffs[3] = allParams[7];
+                bool allZero = (std::abs(distoCoeffs[0]) < 1e-12 &&
+                                std::abs(distoCoeffs[1]) < 1e-12 &&
+                                std::abs(distoCoeffs[2]) < 1e-12 &&
+                                std::abs(distoCoeffs[3]) < 1e-12);
+                if (!allZero) {
+                    distoK = distoCoeffs;
+                }
+            }
+        }
+
         std::list<Eigen::Vector2d> reprojErrors;
 
         for (const auto &corrs : corrsVec) {
@@ -935,14 +954,12 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
             const double DEPTH = 1.0 / INV_DEPTH;
 
             for (const auto &corr : corrs->corrs) {
-                // calculate the so3 and lin scale offset for i-feat
                 double timeIByBr = corr->ti + TO_CmToBr + corr->li * READOUT_TIME;
                 auto SE3_BrToBr0_I = _solver->CurBrToW(timeIByBr);
                 if (SE3_BrToBr0_I == std::nullopt) {
                     continue;
                 }
 
-                // calculate the so3 and lin scale offset for j-feat
                 auto timeJByBr = corr->tj + TO_CmToBr + corr->lj * READOUT_TIME;
                 auto SE3_BrToBr0_J = _solver->CurBrToW(timeJByBr);
                 if (SE3_BrToBr0_J == std::nullopt) {
@@ -954,13 +971,14 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
 
                 Eigen::Vector3d PI;
                 VisualReProjCorr::TransformImgToCam<double>(&FX_INV, &FY_INV, &CX, &CY, corr->fi,
-                                                            &PI);
+                                                            &PI, distoK);
                 PI *= DEPTH * GLOBAL_SCALE;
 
                 Eigen::Vector3d PJ = SE3_CmIToCmJ * PI;
                 PJ /= PJ(2);
                 Eigen::Vector2d fjPred;
-                VisualReProjCorr::TransformCamToImg<double>(&FX, &FY, &CX, &CY, PJ, &fjPred);
+                VisualReProjCorr::TransformCamToImg<double>(&FX, &FY, &CX, &CY, PJ, &fjPred,
+                                                            distoK);
 
                 Eigen::Vector2d residuals = fjPred - corr->fj;
                 reprojErrors.push_back(residuals);
@@ -972,6 +990,38 @@ void CalibSolverIO::SaveVisualReprojectionError() const {
         auto ar = GetOutputArchiveVariant(file, Configor::Preference::OutputDataFormat);
         SerializeByOutputArchiveVariant(ar, Configor::Preference::OutputDataFormat,
                                         cereal::make_nvp("reproj_errors", reprojErrors));
+        
+        // Compute and log per-camera residual statistics
+        if (!reprojErrors.empty()) {
+            double sum = 0.0, sumSq = 0.0, maxErr = 0.0;
+            int count = 0, above2px = 0, above5px = 0;
+            for (const auto& res : reprojErrors) {
+                double norm = res.norm();
+                sum += norm;
+                sumSq += norm * norm;
+                maxErr = std::max(maxErr, norm);
+                if (norm > 2.0) above2px++;
+                if (norm > 5.0) above5px++;
+                count++;
+            }
+            double mean = sum / count;
+            double variance = (sumSq / count) - (mean * mean);
+            double stddev = std::sqrt(std::max(0.0, variance));
+            
+            // Extract short camera name from topic
+            std::string shortName = topic;
+            size_t lastSlash = topic.rfind('/');
+            if (lastSlash != std::string::npos && lastSlash > 0) {
+                size_t prevSlash = topic.rfind('/', lastSlash - 1);
+                if (prevSlash != std::string::npos) {
+                    shortName = topic.substr(prevSlash + 1, lastSlash - prevSlash - 1);
+                }
+            }
+            
+            spdlog::info("  [REPROJ] {}: count={}, mean={:.2f}px, std={:.2f}px, max={:.2f}px, >2px={:.1f}%, >5px={:.1f}%",
+                        shortName, count, mean, stddev, maxErr,
+                        100.0 * above2px / count, 100.0 * above5px / count);
+        }
     }
     spdlog::info("saving visual reprojection errors finished!");
 }

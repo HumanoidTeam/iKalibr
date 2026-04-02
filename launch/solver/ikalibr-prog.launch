@@ -3,7 +3,7 @@
 
     <arg name="config_path" default="$(find ikalibr)/config/ikalibr-config.yaml"/>
 
-    <node pkg="ikalibr" type="ikalibr_prog" name="ikalibr_prog" output="screen">
+    <node pkg="ikalibr" type="ikalibr_prog" name="ikalibr_prog" output="screen" required="true">
         <!-- change the value of this field to the path of your self-defined config file -->
         <param name="config_path" value="$(arg config_path)" type="string"/>
     </node>

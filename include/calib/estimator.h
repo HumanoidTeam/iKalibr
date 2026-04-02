@@ -42,6 +42,7 @@
 #include "config/configor.h"
 #include "ctraj/core/pose.hpp"
 #include "ctraj/core/spline_bundle.h"
+#include "factor/gravity_direction_factor.hpp"
 
 namespace {
 bool IKALIBR_UNIQUE_NAME(_2_) = ns_ikalibr::_1_(__FILE__);
@@ -168,6 +169,16 @@ public:
                                      int numThread = 1);
 
     void PrintParameterInfo() const;
+
+    // Add gravity direction constraint to maintain the configured direction during optimization
+    void AddGravityDirectionConstraint(const Eigen::Vector3d &target_direction, double weight) {
+        auto costFunc = GravityDirectionFactor::Create(target_direction, weight);
+        std::vector<double *> paramBlockVec;
+        paramBlockVec.push_back(parMagr->GRAVITY.data());
+
+        this->AddResidualBlock(costFunc, nullptr, paramBlockVec);
+        this->SetManifold(parMagr->GRAVITY.data(), GRAVITY_MANIFOLD.get());
+    }
 
 public:
     void AddIMUGyroMeasurement(const IMUFrame::Ptr &imuFrame,

@@ -33,7 +33,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include "solver/calib_solver_tpl.hpp"
-#include "magic_enum_flags.hpp"
+#include "magic_enum/magic_enum_flags.hpp"
 #include "util/utils_tpl.hpp"
 
 namespace {
@@ -86,6 +86,15 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
     };
 
     spdlog::info("Optimization option: {}", GetOptString(optOption));
+
+    for (const auto &[topic, _] : Configor::DataStream::CameraTopics) {
+        double TO = _parMagr->TEMPORAL.TO_CmToBr.at(topic);
+        double RS = _parMagr->TEMPORAL.RS_READOUT.at(topic);
+        auto SE3 = _parMagr->EXTRI.SE3_CmToBr(topic);
+        auto t = SE3.translation();
+        spdlog::info("[BATCH_START] Camera '{}': TO={:.6f}s, RS={:.6f}s, POS=[{:.4f}, {:.4f}, {:.4f}]m",
+                     topic, TO, RS, t.x(), t.y(), t.z());
+    }
 
     auto estimator = Estimator::Create(_splines, _parMagr);
     auto visualGlobalScale = std::make_shared<double>(1.0);
@@ -179,6 +188,35 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
                 this->AddLiDARPointToSurfelFactor<TimeDeriv::LIN_POS_SPLINE>(estimator, topic,
                                                                              corrs, optOption);
             }
+            for (const auto &[camTopic, _corrs] : visualReprojCorrs) {
+                auto &intri = _parMagr->INTRI.Camera.at(camTopic);
+                std::string modelType = "PinholeIntrinsic";
+                if (std::dynamic_pointer_cast<ns_veta::PinholeIntrinsicFisheye>(intri)) {
+                    modelType = "PinholeIntrinsicFisheye";
+                } else if (std::dynamic_pointer_cast<ns_veta::PinholeIntrinsicBrownT2>(intri)) {
+                    modelType = "PinholeIntrinsicBrownT2";
+                }
+                double rsReadout = _parMagr->TEMPORAL.RS_READOUT.at(camTopic);
+                bool rsOptThisBatch = IsOptionWith(OptOption::OPT_RS_CAM_READOUT_TIME, optOption);
+                spdlog::info("[MODEL] Camera '{}': type={}, RS_READOUT={:.6f}s, RS_opt_this_batch={}",
+                             camTopic, modelType, rsReadout, rsOptThisBatch);
+                bool hasDisto = intri->HaveDisto();
+                if (hasDisto) {
+                    auto allParams = intri->GetParams();
+                    if (allParams.size() >= 8) {
+                        spdlog::info("[DISTO] Camera '{}': HaveDisto=true, k=[{:.6f}, {:.6f}, {:.6f}, {:.6f}], "
+                                     "fx={:.2f}, fy={:.2f}, nParams={}",
+                                     camTopic, allParams[4], allParams[5], allParams[6], allParams[7],
+                                     allParams[0], allParams[1], allParams.size());
+                    } else {
+                        spdlog::warn("[DISTO] Camera '{}': HaveDisto=true but only {} params (need >=8)!",
+                                     camTopic, allParams.size());
+                    }
+                } else {
+                    spdlog::warn("[DISTO] Camera '{}': HaveDisto=FALSE - distortion NOT applied in factor!",
+                                 camTopic);
+                }
+            }
             for (const auto &[topic, corrs] : visualReprojCorrs) {
                 this->AddVisualReprojectionFactor<TimeDeriv::LIN_POS_SPLINE>(
                     estimator, topic, corrs, visualGlobalScale.get(),
@@ -248,8 +286,41 @@ CalibSolver::BackUp::Ptr CalibSolver::BatchOptimization(
 
     estimator->PrintParameterInfo();
 
-    auto sum = estimator->Solve(_ceresOption, this->_priori);
+    ceres::Solver::Options strictOptions = _ceresOption;
+    // Prefer LM for robustness on large, mixed-unit problems
+    strictOptions.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
+    // Allow more iterations with looser tolerances to prevent early stopping
+    strictOptions.max_num_iterations = 300;
+    strictOptions.function_tolerance = 1e-4;   // Was 1e-6, allow more iterations
+    strictOptions.gradient_tolerance = 1e-6;   // Was 1e-8
+    strictOptions.parameter_tolerance = 1e-6;  // Was 1e-8
+    // Enable inner iterations to help temporal/readout parameters settle
+    strictOptions.use_inner_iterations = true;
+    // Prefer sparse Schur on CPU
+    if (!Configor::Preference::UseCudaInSolving) {
+        strictOptions.linear_solver_type = ceres::SPARSE_SCHUR;
+    }
+    strictOptions.minimizer_progress_to_stdout = true;
+    auto sum = estimator->Solve(strictOptions, this->_priori);
     spdlog::info("here is the summary:\n{}\n", sum.BriefReport());
+
+    spdlog::info("[COST] Initial cost: {:.6e}, Final cost: {:.6e}, Reduction: {:.2f}%",
+                 sum.initial_cost, sum.final_cost,
+                 100.0 * (1.0 - sum.final_cost / sum.initial_cost));
+    spdlog::info("[COST] Num residual blocks: {}, Num residuals: {}, Num parameters: {}",
+                 sum.num_residual_blocks, sum.num_residuals, sum.num_parameters);
+
+    for (const auto &[topic, _] : Configor::DataStream::CameraTopics) {
+        double TO = _parMagr->TEMPORAL.TO_CmToBr.at(topic);
+        double RS = _parMagr->TEMPORAL.RS_READOUT.at(topic);
+        auto SE3 = _parMagr->EXTRI.SE3_CmToBr(topic);
+        auto t = SE3.translation();
+        bool atUpperTO = std::abs(TO - Configor::Prior::TimeOffsetPadding) < 1e-6;
+        bool atLowerTO = std::abs(TO + Configor::Prior::TimeOffsetPadding) < 1e-6;
+        std::string toWarning = (atUpperTO || atLowerTO) ? " *** AT BOUND ***" : "";
+        spdlog::info("[BATCH_END] Camera '{}': TO={:.6f}s{}, RS={:.6f}s, POS=[{:.4f}, {:.4f}, {:.4f}]m",
+                     topic, TO, toWarning, RS, t.x(), t.y(), t.z());
+    }
 
     // align states to the gravity after the batch optimization is finished
     AlignStatesToGravity();

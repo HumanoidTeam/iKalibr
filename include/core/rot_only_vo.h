@@ -101,6 +101,8 @@ public:
         const std::vector<Eigen::Vector2d> &undistPtsInCur,
         double thd);
 
+    [[nodiscard]] FeatureTracking::TrackedFeaturePack::Ptr GetLastTrackedFeaturePack() const { return _trackFeatLast; }
+
 protected:
     static std::pair<std::vector<int>, std::vector<cv::Point2f>> ExtractFeatMapAsRawFeatVec(
         const FeatureMap &featMap, const std::vector<int> &desiredIds = {});

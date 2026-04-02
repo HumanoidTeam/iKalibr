@@ -70,9 +70,9 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
     std::shared_ptr<tqdm> bar;
     std::map<std::string, RotOnlyVisualOdometer::Ptr> rotOnlyOdom;
     // how many features to maintain in each image
-    constexpr int featNumPerImg = 300;
+    constexpr int featNumPerImg = 2000;
     // the min distance between two features (to ensure features are distributed uniformly)
-    constexpr int minDist = 25;
+    constexpr int minDist = 20;
     for (const auto& [topic, _] : Configor::DataStream::PosCameraTopics()) {
         const auto& frameVec = _dataMagr->GetCameraMeasurements(topic);
         spdlog::info(
@@ -98,7 +98,8 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
             }
 
             // we do not want to try to recover the extrinsic rotation too frequent
-            if ((odometer->GetRotations().size() < 50) ||
+            // Use 600 frames minimum before attempting rotation estimation
+            if ((odometer->GetRotations().size() < std::min(600, static_cast<int>(frameVec.size()))) ||
                 (odometer->GetRotations().size() % 5 != 0)) {
                 continue;
             }
@@ -115,14 +116,25 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
                 break;
             }
         }
+        
+        // If we haven't solved yet but have enough rotations, try one final estimation
+        if (!rotEstimator->SolveStatus() && odometer->GetRotations().size() >= 400) {
+            rotEstimator->Estimate(so3Spline, odometer->GetRotations());
+            if (rotEstimator->SolveStatus()) {
+                _parMagr->EXTRI.SO3_CmToBr.at(topic) = rotEstimator->GetSO3SensorToSpline();
+            }
+        }
+        
         if (!rotEstimator->SolveStatus()) {
-            throw Status(Status::ERROR,
-                         "initialize rotation 'SO3_CmToBr' failed, this may be related to "
-                         "insufficiently excited motion or bad images.");
+            spdlog::error("initialize rotation 'SO3_CmToBr' failed for '{}', this may be related to "
+                         "insufficiently excited motion or bad images.", topic);
+            // Don't throw - continue with other cameras and use prior rotation
+            spdlog::warn("Using prior rotation for '{}' instead", topic);
         } else {
             spdlog::info("extrinsic rotation of '{}' is recovered using '{:06}' frames", topic,
                          odometer->GetRotations().size());
         }
+        spdlog::info("[DEBUG] About to call _viewer->UpdateSensorViewer()");
         _viewer->UpdateSensorViewer();
 
         rotOnlyOdom.insert({topic, odometer});
@@ -164,10 +176,26 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
                     weight        // the weight
                 );
             }
-        }
 
-        auto sum = estimator->Solve(_ceresOption, this->_priori);
-        spdlog::info("here is the summary:\n{}\n", sum.BriefReport());
+            // Log initial time offset before optimization
+            double initial_time_offset = _parMagr->TEMPORAL.TO_CmToBr.at(topic);
+            spdlog::info("[Rotation Alignment] Initial time offset for camera '{}': {:.12f} s", topic, initial_time_offset);
+
+            // Use even stricter solver options for convergence
+            ceres::Solver::Options strictOptions = _ceresOption;
+            strictOptions.max_num_iterations = 500;
+            strictOptions.function_tolerance = 1e-12;
+            strictOptions.gradient_tolerance = 1e-12;
+            strictOptions.parameter_tolerance = 1e-12;
+            strictOptions.minimizer_progress_to_stdout = true;
+            auto sum = estimator->Solve(strictOptions, this->_priori);
+            spdlog::info("[Rotation Alignment] Ceres summary:\n{}\n", sum.BriefReport());
+
+            // Log final time offset after optimization
+            double final_time_offset = _parMagr->TEMPORAL.TO_CmToBr.at(topic);
+            spdlog::info("[Rotation Alignment] Final time offset for camera '{}': {:.12f} s", topic, final_time_offset);
+            spdlog::info("[Rotation Alignment] Time offset change for camera '{}': {:.12e} s", topic, final_time_offset - initial_time_offset);
+        }
     }
 
     /**
@@ -180,14 +208,28 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
     for (const auto& [topic, _] : Configor::DataStream::PosCameraTopics()) {
         const auto& data = _dataMagr->GetCameraMeasurements(topic);
         // load data if SfM has been performed
+        spdlog::info("Attempting to load SfM data for topic '{}'", topic);
+        
+        // Check if topic exists in CameraTopics
+        if (Configor::DataStream::CameraTopics.find(topic) == Configor::DataStream::CameraTopics.end()) {
+            spdlog::error("Topic '{}' not found in CameraTopics!", topic);
+            throw std::runtime_error("Topic not found in CameraTopics");
+        }
+        
+        double trackLengthMin = Configor::DataStream::CameraTopics.at(topic).TrackLengthMin;
+        spdlog::info("Track length min for topic '{}': {}", topic, trackLengthMin);
+        
+        bool isRS = IsRSCamera(topic);
+        spdlog::info("Topic '{}' is{} an RS camera", topic, isRS ? "" : " not");
+        
         auto veta = TryLoadSfMData(
             // ros topic
             topic,
             // for rs camera, as the rs effect is not considered in SfM,
             // we relax the landmark selection condition
-            IsRSCamera(topic) ? 2.0 : 1.0,
+            isRS ? 2.0 : 1.0,
             // the track length threshold
-            Configor::DataStream::CameraTopics.at(topic).TrackLengthMin);
+            trackLengthMin);
         if (veta != nullptr) {
             /**
              * the SfM result data is valid fro this camera, we store it in the data manager
@@ -234,9 +276,42 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
          * SfM are performed.
          */
         spdlog::info("store images of '{}' for SfM...", topic);
-        StoreImagesForSfM(topic, sfm->FindCovisibility(0.1));
+        bool sfm_run = StoreImagesForSfM(topic, sfm->FindCovisibility(0.1));
 
-        ++needSfMCount;
+        if (!sfm_run) {
+            ++needSfMCount;
+        } else {
+            // Internal COLMAP completed — reload the SfM data it produced
+            auto veta = TryLoadSfMData(topic, isRS ? 2.0 : 1.0, trackLengthMin);
+            if (veta != nullptr) {
+                spdlog::info("internal SfM for '{}' succeeded, loading result", topic);
+                DownsampleVeta(veta, 10000, trackLengthMin);
+                _dataMagr->SetSfMData(topic, veta);
+                _viewer->AddVeta(veta, Viewer::VIEW_MAP);
+
+                spdlog::info(
+                    "SfM info for topic '{}' after filtering: view count: {}, landmark count: {}",
+                    topic, veta->views.size(), veta->structure.size());
+
+                // Internal COLMAP undistorts images and uses PINHOLE, so features
+                // are in undistorted space. Zero out distortion coefficients so
+                // the factor does pure pinhole projection (allZero → distoK=nullptr).
+                auto intri = std::dynamic_pointer_cast<ns_veta::PinholeIntrinsicFisheye>(
+                    _parMagr->INTRI.Camera.at(topic));
+                if (intri) {
+                    auto p = intri->GetParams();
+                    // GetParams returns [fx, fy, cx, cy, k1, k2, k3, k4]
+                    if (p.size() >= 8) {
+                        p[4] = 0.0; p[5] = 0.0; p[6] = 0.0; p[7] = 0.0;
+                        intri->UpdateFromParams(p);
+                        spdlog::info("zeroed distortion for '{}' (internal SfM uses PINHOLE)", topic);
+                    }
+                }
+            } else {
+                spdlog::error("internal SfM for '{}' ran but TryLoadSfMData still failed", topic);
+                ++needSfMCount;
+            }
+        }
     }
     if (needSfMCount != 0) {
         throw ns_ikalibr::Status(Status::FINE,
@@ -261,8 +336,11 @@ void CalibSolver::InitPrepPosCameraInertialAlign() const {
         "results...");
     auto estimator = Estimator::Create(_splines, _parMagr);
     auto optOption = OptOption::OPT_SO3_CmToBr;
-    if (Configor::Prior::OptTemporalParams) {
+    if (Configor::Prior::OptTemporalParams && Configor::Prior::SfMRefineTimeOffset) {
         optOption |= OptOption::OPT_TO_CmToBr;
+        spdlog::info("SfM refinement will also optimize time offsets (SfMRefineTimeOffset=true)");
+    } else {
+        spdlog::info("SfM refinement will NOT touch time offsets (using rotation alignment values)");
     }
 
     for (const auto& [camTopic, veta] : _dataMagr->GetSfMData()) {

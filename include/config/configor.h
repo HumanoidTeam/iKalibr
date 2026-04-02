@@ -255,11 +255,21 @@ public:
     static struct Prior {
         static std::string SpatTempPrioriPath;
         static double GravityNorm;
+        static double GravityDirectionX;
+        static double GravityDirectionY;
+        static double GravityDirectionZ;
         static constexpr int SplineOrder = 4;
         static bool OptTemporalParams;
         static double TimeOffsetPadding;
         static double ReadoutTimePadding;
         static double MapDownSample;
+        // Configurable prior weights for extrinsics constraints
+        static double PrioriWeightSO3;   // Rotation prior weight
+        static double PrioriWeightPOS;   // Translation prior weight
+        static double PrioriWeightTO;    // Time offset prior weight
+        static double MaxTemporalSpan;   // Max temporal gap (seconds) for visual reprojection pairs
+        static double PositionPadding;   // Max translation correction from prior (meters)
+        static bool SfMRefineTimeOffset; // Whether to refine time offsets beyond rotation alignment
 
         static struct KnotTimeDist {
             static double SO3Spline;
@@ -309,7 +319,7 @@ public:
         // the loss function used for lidar factor (m)
         const static double LossForPointToSurfelFactor;
         // the loss function used for visual reprojection factor (pixel)
-        const static double LossForReprojFactor;
+        static double LossForReprojFactor;
         // the loss function used for rgbd velocity factor (pixel) (on the image pixel plane)
         const static double LossForOpticalFlowFactor;
 
@@ -317,8 +327,11 @@ public:
         template <class Archive>
         void serialize(Archive &ar) {
             ar(CEREAL_NVP(SpatTempPrioriPath), CEREAL_NVP(GravityNorm),
+               CEREAL_NVP(GravityDirectionX), CEREAL_NVP(GravityDirectionY), CEREAL_NVP(GravityDirectionZ),
                CEREAL_NVP(OptTemporalParams), CEREAL_NVP(TimeOffsetPadding),
                CEREAL_NVP(ReadoutTimePadding), CEREAL_NVP(MapDownSample),
+               CEREAL_NVP(PrioriWeightSO3), CEREAL_NVP(PrioriWeightPOS), CEREAL_NVP(PrioriWeightTO),
+               CEREAL_NVP(MaxTemporalSpan), CEREAL_NVP(LossForReprojFactor),
                cereal::make_nvp("KnotTimeDist", knotTimeDist),
                cereal::make_nvp("NDTLiDAROdometer", ndtLiDAROdometer),
                cereal::make_nvp("LiDARDataAssociate", lidarDataAssociate));

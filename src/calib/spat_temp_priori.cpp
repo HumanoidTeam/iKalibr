@@ -241,48 +241,59 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
     }
     auto RefIMU = Configor::DataStream::ReferIMU;
 
+    // Log prior weights being used
+    spdlog::info("Prior weights: SO3={:.1f}, POS={:.1f}, TO={:.1f}",
+                 Configor::Prior::PrioriWeightSO3,
+                 Configor::Prior::PrioriWeightPOS,
+                 Configor::Prior::PrioriWeightTO);
+
+    // Use separate weights for rotation (SO3) and translation (POS) priors
+    // This allows finer control over how much the optimizer can deviate from priors
+    int so3_constraints = 0;
     for (const auto& [sensorPair, Sen1ToSen2] : this->SO3_Sen1ToSen2) {
         const auto& [sen1, sen2] = sensorPair;
         Sophus::SO3d *rot1 = SO3Address.at(sen1), *rot2 = SO3Address.at(sen2);
         if (sen2 == RefIMU) {
-            // if this priori is with respect to the reference IMU, set param constant directly
+            // Initialize to prior and add constraint to keep it close during optimization
             *rot1 = Sen1ToSen2;
-            if (estimator.HasParameterBlock(rot1->data())) {
-                estimator.SetParameterBlockConstant(rot1->data());
-            }
+            estimator.AddPriorExtriSO3Constraint(Sen1ToSen2, rot1, rot2, Configor::Prior::PrioriWeightSO3);
+            spdlog::info("  [SO3 Prior] {} -> {}: weight={:.1f}", sen1, sen2, Configor::Prior::PrioriWeightSO3);
+            so3_constraints++;
         } else if (estimator.HasParameterBlock(rot1->data()) ||
                    estimator.HasParameterBlock(rot2->data())) {
-            // only one of the param block has been added to problem, we then add the constraint,
-            // to make sure a unique least-squares solution
-            estimator.AddPriorExtriSO3Constraint(Sen1ToSen2, rot1, rot2, PrioriWeight);
+            estimator.AddPriorExtriSO3Constraint(Sen1ToSen2, rot1, rot2, Configor::Prior::PrioriWeightSO3);
+            so3_constraints++;
         }
     }
+    spdlog::info("Added {} SO3 prior constraints", so3_constraints);
+
+    int pos_constraints = 0;
     for (const auto& [sensorPair, Sen1InSen2] : this->POS_Sen1InSen2) {
         const auto& [sen1, sen2] = sensorPair;
         Eigen::Vector3d *pos1 = POSAddress.at(sen1), *pos2 = POSAddress.at(sen2);
         Sophus::SO3d* rot2 = SO3Address.at(sen2);
         if (sen2 == RefIMU) {
-            // if this priori is with respect to the reference IMU, set param constant directly
             *pos1 = Sen1InSen2;
-            if (estimator.HasParameterBlock(pos1->data())) {
-                estimator.SetParameterBlockConstant(pos1->data());
-            }
+            estimator.AddPriorExtriPOSConstraint(Sen1InSen2, pos1, rot2, pos2, Configor::Prior::PrioriWeightPOS);
+            spdlog::info("  [POS Prior] {} -> {}: prior=[{:.4f}, {:.4f}, {:.4f}]m, weight={:.1f}",
+                        sen1, sen2, Sen1InSen2.x(), Sen1InSen2.y(), Sen1InSen2.z(),
+                        Configor::Prior::PrioriWeightPOS);
+            pos_constraints++;
         } else if (estimator.HasParameterBlock(pos1->data()) ||
                    estimator.HasParameterBlock(pos2->data())) {
-            estimator.AddPriorExtriPOSConstraint(Sen1InSen2, pos1, rot2, pos2, PrioriWeight);
+            estimator.AddPriorExtriPOSConstraint(Sen1InSen2, pos1, rot2, pos2, Configor::Prior::PrioriWeightPOS);
+            pos_constraints++;
         }
     }
+    spdlog::info("Added {} POS prior constraints", pos_constraints);
     for (const auto& [sensorPair, Sen1ToSen2] : this->TO_Sen1ToSen2) {
         const auto& [sen1, sen2] = sensorPair;
         double *to1 = TOAddress.at(sen1), *to2 = TOAddress.at(sen2);
         if (sen2 == RefIMU) {
-            // if this priori is with respect to the reference IMU, set param constant directly
             *to1 = Sen1ToSen2;
-            if (estimator.HasParameterBlock(to1)) {
-                estimator.SetParameterBlockConstant(to1);
-            }
+            estimator.AddPriorTimeOffsetConstraint(Sen1ToSen2, to1, to2, Configor::Prior::PrioriWeightTO);
         } else if (estimator.HasParameterBlock(to1) || estimator.HasParameterBlock(to2)) {
-            estimator.AddPriorTimeOffsetConstraint(Sen1ToSen2, to1, to2, PrioriWeight);
+            estimator.AddPriorTimeOffsetConstraint(Sen1ToSen2, to1, to2, Configor::Prior::PrioriWeightTO);
         }
     }
     // readout times (we set them as constraints in optimization)
@@ -290,7 +301,7 @@ void SpatialTemporalPriori::AddSpatTempPrioriConstraint(Estimator& estimator,
         double* data = &parMagr.TEMPORAL.RS_READOUT.at(sensor);
         *data = readout;
         if (estimator.HasParameterBlock(data)) {
-            estimator.SetParameterBlockConstant(data);
+            // estimator.SetParameterBlockConstant(data);
         }
     }
     spdlog::info("add spatial and temp priori constraint finished");

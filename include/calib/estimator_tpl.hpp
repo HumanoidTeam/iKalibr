@@ -603,9 +603,31 @@ void Estimator::AddVisualReprojection(const VisualReProjCorr::Ptr &visualCorr,
     }
 
     static constexpr int deriv = TimeDeriv::Deriv<type, TimeDeriv::LIN_POS>();
+
+    auto &intri = parMagr->INTRI.Camera.at(topic);
+
+    const double *distoK = nullptr;
+    double distoCoeffs[4] = {0, 0, 0, 0};
+    if (intri->HaveDisto()) {
+        auto allParams = intri->GetParams();
+        if (allParams.size() >= 8) {
+            distoCoeffs[0] = allParams[4];
+            distoCoeffs[1] = allParams[5];
+            distoCoeffs[2] = allParams[6];
+            distoCoeffs[3] = allParams[7];
+            bool allZero = (std::abs(distoCoeffs[0]) < 1e-12 &&
+                            std::abs(distoCoeffs[1]) < 1e-12 &&
+                            std::abs(distoCoeffs[2]) < 1e-12 &&
+                            std::abs(distoCoeffs[3]) < 1e-12);
+            if (!allZero) {
+                distoK = distoCoeffs;
+            }
+        }
+    }
+
     // create a cost function
     auto costFunc = VisualReProjFactor<Configor::Prior::SplineOrder, deriv>::Create(
-        so3Meta, scaleMeta, visualCorr, weight);
+        so3Meta, scaleMeta, visualCorr, weight, distoK);
 
     // so3 knots param block [each has four sub params]
     for (int i = 0; i < static_cast<int>(so3Meta.NumParameters()); ++i) {
@@ -653,7 +675,6 @@ void Estimator::AddVisualReprojection(const VisualReProjCorr::Ptr &visualCorr,
     paramBlockVec.push_back(TO_CmToBr);
     paramBlockVec.push_back(RS_READOUT);
 
-    auto &intri = parMagr->INTRI.Camera.at(topic);
     paramBlockVec.push_back(intri->FXAddress());
     paramBlockVec.push_back(intri->FYAddress());
     paramBlockVec.push_back(intri->CXAddress());
@@ -663,7 +684,8 @@ void Estimator::AddVisualReprojection(const VisualReProjCorr::Ptr &visualCorr,
     paramBlockVec.push_back(invDepth);
 
     // pass to problem
-    this->AddResidualBlock(costFunc, new ceres::CauchyLoss(Configor::Prior::LossForReprojFactor),
+    this->AddResidualBlock(costFunc,
+                           new ceres::HuberLoss(Configor::Prior::LossForReprojFactor * weight),
                            paramBlockVec);
     this->SetManifold(SO3_CmToBr, QUATER_MANIFOLD.get());
 
@@ -673,6 +695,21 @@ void Estimator::AddVisualReprojection(const VisualReProjCorr::Ptr &visualCorr,
 
     if (!IsOptionWith(Opt::OPT_POS_CmInBr, option)) {
         this->SetParameterBlockConstant(POS_CmInBr);
+    } else {
+        double posPad = Configor::Prior::PositionPadding;
+        if (posPad > 0) {
+            static std::map<const double*, Eigen::Vector3d> posPriorMap;
+            auto prIt = posPriorMap.find(POS_CmInBr);
+            if (prIt == posPriorMap.end()) {
+                posPriorMap[POS_CmInBr] = Eigen::Map<const Eigen::Vector3d>(POS_CmInBr);
+                prIt = posPriorMap.find(POS_CmInBr);
+            }
+            const auto& priorPos = prIt->second;
+            for (int d = 0; d < 3; ++d) {
+                this->SetParameterLowerBound(POS_CmInBr, d, priorPos[d] - posPad);
+                this->SetParameterUpperBound(POS_CmInBr, d, priorPos[d] + posPad);
+            }
+        }
     }
 
     if (!IsOptionWith(Opt::OPT_TO_CmToBr, option)) {
@@ -990,6 +1027,21 @@ void Estimator::AddVisualOpticalFlowConstraint(const OpticalFlowCorr::Ptr &ofCor
 
     if (!IsOptionWith(Opt::OPT_POS_CmInBr, option)) {
         this->SetParameterBlockConstant(POS_CmInBr);
+    } else {
+        double posPad = Configor::Prior::PositionPadding;
+        if (posPad > 0) {
+            static std::map<const double*, Eigen::Vector3d> posPriorMap;
+            auto prIt = posPriorMap.find(POS_CmInBr);
+            if (prIt == posPriorMap.end()) {
+                posPriorMap[POS_CmInBr] = Eigen::Map<const Eigen::Vector3d>(POS_CmInBr);
+                prIt = posPriorMap.find(POS_CmInBr);
+            }
+            const auto& priorPos = prIt->second;
+            for (int d = 0; d < 3; ++d) {
+                this->SetParameterLowerBound(POS_CmInBr, d, priorPos[d] - posPad);
+                this->SetParameterUpperBound(POS_CmInBr, d, priorPos[d] + posPad);
+            }
+        }
     }
 
     if (!IsOptionWith(Opt::OPT_TO_CmToBr, option)) {
@@ -1475,6 +1527,21 @@ void Estimator::AddVisualOpticalFlowReprojConstraint(const OpticalFlowCorrPtr &o
 
     if (!IsOptionWith(Opt::OPT_POS_CmInBr, option)) {
         this->SetParameterBlockConstant(POS_CmInBr);
+    } else {
+        double posPad = Configor::Prior::PositionPadding;
+        if (posPad > 0) {
+            static std::map<const double*, Eigen::Vector3d> posPriorMap;
+            auto prIt = posPriorMap.find(POS_CmInBr);
+            if (prIt == posPriorMap.end()) {
+                posPriorMap[POS_CmInBr] = Eigen::Map<const Eigen::Vector3d>(POS_CmInBr);
+                prIt = posPriorMap.find(POS_CmInBr);
+            }
+            const auto& priorPos = prIt->second;
+            for (int d = 0; d < 3; ++d) {
+                this->SetParameterLowerBound(POS_CmInBr, d, priorPos[d] - posPad);
+                this->SetParameterUpperBound(POS_CmInBr, d, priorPos[d] + posPad);
+            }
+        }
     }
 
     if (!IsOptionWith(Opt::OPT_TO_CmToBr, option)) {
@@ -1638,6 +1705,21 @@ void Estimator::AddVisualPPPTrifocalTensorFactorForVelCam(const OpticalFlowCorrP
 
     if (!IsOptionWith(Opt::OPT_POS_CmInBr, option)) {
         this->SetParameterBlockConstant(POS_CmInBr);
+    } else {
+        double posPad = Configor::Prior::PositionPadding;
+        if (posPad > 0) {
+            static std::map<const double*, Eigen::Vector3d> posPriorMap;
+            auto prIt = posPriorMap.find(POS_CmInBr);
+            if (prIt == posPriorMap.end()) {
+                posPriorMap[POS_CmInBr] = Eigen::Map<const Eigen::Vector3d>(POS_CmInBr);
+                prIt = posPriorMap.find(POS_CmInBr);
+            }
+            const auto& priorPos = prIt->second;
+            for (int d = 0; d < 3; ++d) {
+                this->SetParameterLowerBound(POS_CmInBr, d, priorPos[d] - posPad);
+                this->SetParameterUpperBound(POS_CmInBr, d, priorPos[d] + posPad);
+            }
+        }
     }
 
     if (!IsOptionWith(Opt::OPT_TO_CmToBr, option)) {
